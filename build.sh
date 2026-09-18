@@ -1,14 +1,7 @@
-#!/bin/sh
-set -eu
+#!/bin/bash
 
-. ../emsdk/emsdk_env.sh
+. $HOME/Desktop/emsdk/emsdk_env.sh
 
-if [ -d build ]; then
-  rm -rf build
-fi
+make clean
 
-mkdir build
-cd build
-
-emcmake cmake ..              
-emmake make
+make BUILD_TYPE=Release
