@@ -2,7 +2,8 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
-// Struktur für deinen Spielzustand (verhindert globale Variablen)
+#include <stdio.h>
+
 typedef struct
 {
     SDL_Window *window;
@@ -10,64 +11,87 @@ typedef struct
     bool running;
 } AppState;
 
-// 1. Initialisierung (Wird einmalig beim Start aufgerufen)
+/**
+ * By default emsdl uses stderr to write logs. This is mapped to
+ * console.error(). Using printf writes to console.log().
+ */
+void LogOutputFunction(void *userdata, int category, SDL_LogPriority priority, const char *message)
+{
+    printf("%s\n", message);
+}
+
+/**
+ * SDL callback function to initialize the app.
+ */
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
-    // Speicher für den Zustand reservieren
+    //
+    // Register our LogOutputFunction to log to console.log()
+    //
+    SDL_SetLogOutputFunction(LogOutputFunction, NULL);
+
+    //
+    // Allocate AppState
+    //
     AppState *state = SDL_calloc(1, sizeof(AppState));
     if (!state)
     {
+        SDL_Log("Unable to allocate memory for AppState: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
     *appstate = state;
 
-    // SDL Video initialisieren
+    //
+    // Initialize SDL video
+    //
     if (!SDL_Init(SDL_INIT_VIDEO))
     {
-        SDL_Log("SDL konnte nicht initialisiert werden: %s", SDL_GetError());
+        SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
 
-    // Fenster und Renderer erstellen
+    //
+    // Create window and renderer
+    //
     if (!SDL_CreateWindowAndRenderer("SDL3 WASM Game", 800, 600, 0, &state->window, &state->renderer))
     {
-        SDL_Log("Fenster/Renderer Fehler: %s", SDL_GetError());
+        SDL_Log("Unable to create window and renderer: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
 
-    SDL_Log("Started!");
-
-    return SDL_APP_CONTINUE; // Signalisiert erfolgreichen Start
+    return SDL_APP_CONTINUE;
 }
 
-// 2. Event-Handling (Wird für jedes anstehende Event aufgerufen)
+/**
+ * SDL callback function to process events
+ */
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 {
     if (event->type == SDL_EVENT_QUIT)
     {
-        return SDL_APP_SUCCESS; // Beendet die App sauber
+        return SDL_APP_SUCCESS;
     }
-    return SDL_APP_CONTINUE; // App läuft weiter
+    return SDL_APP_CONTINUE;
 }
 
-// 3. Game-Loop / Rendering (Wird einmal pro Frame aufgerufen)
+/**
+ * SDL callback function which is call in the game-loop / rendering (once a frame)
+ */
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
     AppState *state = (AppState *)appstate;
 
-    // Hintergrundfarbe setzen (z. B. Dunkelblau)
     SDL_SetRenderDrawColor(state->renderer, 120, 40, 80, 255);
     SDL_RenderClear(state->renderer);
 
-    // Hier kommt dein Zeichencode hin (z. B. SDL_RenderTexture)
-
-    // Auf den Bildschirm bringen
     SDL_RenderPresent(state->renderer);
 
-    return SDL_APP_CONTINUE; // Weitermachen zum nächsten Frame
+    return SDL_APP_CONTINUE;
 }
 
-// 4. Cleanup (Wird beim Beenden aufgerufen)
+/**
+ * SDL callback function to cleanup before quit.
+ */
 void SDL_AppQuit(void *appstate, SDL_AppResult result)
 {
     if (appstate)
@@ -78,5 +102,4 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result)
         SDL_free(state);
     }
     SDL_Quit();
-    SDL_Log("App erfolgreich beendet.");
 }
