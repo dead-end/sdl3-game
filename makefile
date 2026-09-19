@@ -2,10 +2,10 @@
 # Emscripten SDL3 Makefile
 # ==============================================================================
 
-# Compiler & Projectname
 CC = emcc
 PROJECT_NAME = sdl3game
 TARGET = index.html
+BUILD_DIR=build
 
 # C-Standard and Include-Pfad for own headers (-Iinclude)
 CFLAGS = -std=c11 -Iinclude
@@ -49,12 +49,21 @@ endif
 all: $(TARGET)
 
 $(TARGET): $(SRC_FILES)
-	@mkdir -p build
-	$(CC) $(CFLAGS) $(SRC_FILES) $(WASM_FLAGS) -o build/$(TARGET)
-	@echo "Build finished: build/$(TARGET) ($(BUILD_TYPE)-Modus)"
+	@mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(SRC_FILES) $(WASM_FLAGS) -o $(BUILD_DIR)/$(TARGET)
+	@echo "Build finished: $(BUILD_DIR)/$(TARGET) ($(BUILD_TYPE)-Modus)"
 
 clean:
-	rm -rf build
+	rm -rf $(BUILD_DIR)
 	@echo "Build cleanup."
 
-.PHONY: all clean
+#
+# Start web server for the file
+#
+run:
+	emrun --port 8080 --no_browser $(BUILD_DIR)/$(TARGET) 
+
+#
+# Targets that do not build files
+#
+.PHONY: all clean run
