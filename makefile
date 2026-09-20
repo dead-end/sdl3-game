@@ -9,13 +9,16 @@ BUILD_DIR=build
 
 # C-Standard and Include-Pfad for own headers (-Iinclude)
 CFLAGS = -std=c11 -Iinclude
+CFLAGS += -Wall -Wextra
 
 # Build-Type (Standard: Release. Can be changed with: make BUILD_TYPE=Debug)
 BUILD_TYPE ?= Release
 
 # Source files
 SRC_FILES = src/main.c \
-            src/game.c
+            src/screen_manager.c \
+            src/start_screen.c
+            
 
 # ------------------------------------------------------------------------------
 # WebAssembly & SDL3 Linker-Flags
