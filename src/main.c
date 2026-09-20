@@ -1,21 +1,28 @@
-#define SDL_MAIN_USE_CALLBACKS 1 // Aktiviert das neue SDL3-Callback-System
+//
+// Activates SDL3 callback system
+//
+#define SDL_MAIN_USE_CALLBACKS 1
+
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
 #include <stdio.h>
+#include "screen_manager.h"
 
 typedef struct
 {
     SDL_Window *window;
     SDL_Renderer *renderer;
-    bool running;
-} AppState;
+    ScreenManager screen_manager;
+    uint64_t last_time;
+} AppContext;
 
 /**
  * By default emsdl uses stderr to write logs. This is mapped to
  * console.error(). Using printf writes to console.log().
  */
-void LogOutputFunction(void *userdata, int category, SDL_LogPriority priority, const char *message)
+void LogOutputFunction(void *userdata __attribute__((unused)), int category __attribute__((unused)), SDL_LogPriority priority __attribute__((unused)),
+                       const char *message)
 {
     printf("%s\n", message);
 }
@@ -23,7 +30,8 @@ void LogOutputFunction(void *userdata, int category, SDL_LogPriority priority, c
 /**
  * SDL callback function to initialize the app.
  */
-SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
+SDL_AppResult SDL_AppInit(void **appstate,
+                          int argc __attribute__((unused)), char *argv[] __attribute__((unused)))
 {
     //
     // Register our LogOutputFunction to log to console.log()
@@ -33,13 +41,13 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     //
     // Allocate AppState
     //
-    AppState *state = SDL_calloc(1, sizeof(AppState));
-    if (!state)
+    AppContext *ctx = SDL_calloc(1, sizeof(AppContext));
+    if (!ctx)
     {
         SDL_Log("Unable to allocate memory for AppState: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
-    *appstate = state;
+    *appstate = ctx;
 
     //
     // Initialize SDL video
@@ -53,11 +61,18 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     //
     // Create window and renderer
     //
-    if (!SDL_CreateWindowAndRenderer("SDL3 WASM Game", 800, 600, 0, &state->window, &state->renderer))
+    if (!SDL_CreateWindowAndRenderer("SDL3 WASM Game", 800, 600, 0, &ctx->window, &ctx->renderer))
     {
         SDL_Log("Unable to create window and renderer: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
+
+    ctx->last_time = SDL_GetTicks();
+
+    ctx->screen_manager.renderer = ctx->renderer;
+    sm_register_screen(&ctx->screen_manager, SCREEN_START, StartScreen_Create());
+    sm_change_screen(&ctx->screen_manager, SCREEN_START);
+    sm_process_change(&ctx->screen_manager);
 
     return SDL_APP_CONTINUE;
 }
@@ -71,7 +86,10 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
     {
         return SDL_APP_SUCCESS;
     }
-    return SDL_APP_CONTINUE;
+
+    AppContext *ctx = (AppContext *)appstate;
+
+    return sm_screen_event(&ctx->screen_manager, event);
 }
 
 /**
@@ -79,13 +97,44 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
  */
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
-    AppState *state = (AppState *)appstate;
+    SDL_AppResult res;
+    AppContext *ctx = (AppContext *)appstate;
+    ScreenManager *sm = &ctx->screen_manager;
 
-    SDL_SetRenderDrawColor(state->renderer, 120, 40, 80, 255);
-    SDL_RenderClear(state->renderer);
+    //
+    // Process pending screen changes
+    //
+    sm_process_change(sm);
 
-    SDL_RenderPresent(state->renderer);
+    //
+    // Compute delta time
+    //
+    uint64_t now = SDL_GetTicks();
+    double delta_time = (double)(now - ctx->last_time) / 1000.0;
+    ctx->last_time = now;
 
+    //
+    // Update with delta time
+    //
+    res = sm_screen_update(sm, delta_time);
+    if (res != SDL_APP_CONTINUE)
+    {
+        return res;
+    }
+
+    //
+    // Rendering
+    //
+    SDL_SetRenderDrawColor(sm->renderer, 0, 0, 0, 255);
+    SDL_RenderClear(sm->renderer);
+
+    res = sm_screen_render(sm, sm->renderer);
+    if (res != SDL_APP_CONTINUE)
+    {
+        return res;
+    }
+
+    SDL_RenderPresent(sm->renderer);
     return SDL_APP_CONTINUE;
 }
 
@@ -94,12 +143,20 @@ SDL_AppResult SDL_AppIterate(void *appstate)
  */
 void SDL_AppQuit(void *appstate, SDL_AppResult result)
 {
+
+    if (result == SDL_APP_FAILURE)
+    {
+        SDL_Log("App finished due to a failure!");
+    }
     if (appstate)
     {
-        AppState *state = (AppState *)appstate;
-        SDL_DestroyRenderer(state->renderer);
-        SDL_DestroyWindow(state->window);
-        SDL_free(state);
+        AppContext *ctx = (AppContext *)appstate;
+
+        sm_screen_cleanup(&ctx->screen_manager);
+
+        SDL_DestroyRenderer(ctx->renderer);
+        SDL_DestroyWindow(ctx->window);
+        SDL_free(ctx);
     }
     SDL_Quit();
 }
