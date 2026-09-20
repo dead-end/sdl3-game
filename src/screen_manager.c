@@ -3,22 +3,29 @@
 #include "screen.h"
 #include "screen_manager.h"
 
+void sm_register_screen(ScreenManager *sm, ScreenType type, Screen screen)
+{
+    sm->screens[type] = screen;
+}
+
 /**
  * The function registers a request for a screen change. The change is not done
  * immediately. It will be processed at the beginning of the next frame, to
  * prevent errors.
  */
-void ScreenManager_ChangeScreen(ScreenManager *sm, Screen screen)
+void sm_change_screen(ScreenManager *sm, ScreenType next)
 {
-    sm->next = screen;
+    sm->next = next;
     sm->change = true;
 }
 
 /**
  * The function processes the change of the screen.
  */
-void ScreenManager_ProcessPendingChange(ScreenManager *sm)
+void sm_process_change(ScreenManager *sm)
 {
+    Screen *current;
+
     //
     // Check if a change of the screen is requested
     //
@@ -30,9 +37,10 @@ void ScreenManager_ProcessPendingChange(ScreenManager *sm)
     //
     // Cleanup the old screen
     //
-    if (sm->current.cleanup)
+    current = &(sm->screens[sm->current]);
+    if (current->cleanup)
     {
-        sm->current.cleanup(sm->current.state);
+        current->cleanup(current->state);
     }
 
     //
@@ -44,8 +52,60 @@ void ScreenManager_ProcessPendingChange(ScreenManager *sm)
     //
     // Initialize the new screen
     //
-    if (sm->current.init)
+    current = &(sm->screens[sm->current]);
+    if (current->init)
     {
-        sm->current.init(sm->current.state, sm->renderer);
+        current->init(current->state, sm->renderer);
+    }
+}
+
+/**
+ * The function calls the event function of the screen.
+ */
+SDL_AppResult sm_screen_event(ScreenManager *sm, SDL_Event *event)
+{
+    Screen *current = &(sm->screens[sm->current]);
+    if (current->event)
+    {
+        return current->event(current->state, event);
+    }
+    return SDL_APP_CONTINUE;
+}
+
+/**
+ * The function calls the update function of the screen.
+ */
+SDL_AppResult sm_screen_update(ScreenManager *sm, double delta_time)
+{
+    Screen *current = &(sm->screens[sm->current]);
+    if (current->update)
+    {
+        return current->update(current->state, delta_time);
+    }
+    return SDL_APP_CONTINUE;
+}
+
+/**
+ * The function calls the render function of the screen.
+ */
+SDL_AppResult sm_screen_render(ScreenManager *sm, SDL_Renderer *renderer)
+{
+    Screen *current = &(sm->screens[sm->current]);
+    if (current->render)
+    {
+        return current->render(current->state, renderer);
+    }
+    return SDL_APP_CONTINUE;
+}
+
+/**
+ * The function calls the cleanup function of the screen.
+ */
+void sm_screen_cleanup(ScreenManager *sm)
+{
+    Screen *current = &(sm->screens[sm->current]);
+    if (current->cleanup)
+    {
+        current->cleanup(current->state);
     }
 }
