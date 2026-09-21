@@ -22,6 +22,4 @@ typedef struct Screen
     void *state;
 } Screen;
 
-Screen StartScreen_Create(void);
-
 #endif
