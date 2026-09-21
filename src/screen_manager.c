@@ -3,7 +3,7 @@
 #include "screen.h"
 #include "screen_manager.h"
 
-void sm_register_screen(ScreenManager *sm, ScreenType type, Screen screen)
+static void _register_screen(ScreenManager *sm, ScreenType type, Screen screen)
 {
     sm->screens[type] = screen;
 }
@@ -101,11 +101,20 @@ SDL_AppResult sm_screen_render(ScreenManager *sm, SDL_Renderer *renderer)
 /**
  * The function calls the cleanup function of the screen.
  */
-void sm_screen_cleanup(ScreenManager *sm)
+void sm_cleanup(ScreenManager *sm)
 {
     Screen *current = &(sm->screens[sm->current]);
     if (current->cleanup)
     {
         current->cleanup(current->state);
     }
+}
+
+SDL_AppResult sm_init(ScreenManager *sm, SDL_Renderer *renderer)
+{
+    _register_screen(sm, SCREEN_START, StartScreen_Create());
+    sm_change_screen(sm, SCREEN_START);
+    sm_process_change(sm, renderer);
+
+    return SDL_APP_CONTINUE;
 }

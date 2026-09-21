@@ -19,8 +19,6 @@ typedef struct ScreenManager
     Screen screens[_TOTAL_];
 } ScreenManager;
 
-void sm_register_screen(ScreenManager *sm, ScreenType type, Screen screen);
-
 void sm_change_screen(ScreenManager *sm, ScreenType type);
 
 void sm_process_change(ScreenManager *sm, SDL_Renderer *renderer);
@@ -31,6 +29,8 @@ SDL_AppResult sm_screen_update(ScreenManager *sm, double delta_time);
 
 SDL_AppResult sm_screen_render(ScreenManager *sm, SDL_Renderer *renderer);
 
-void sm_screen_cleanup(ScreenManager *sm);
+SDL_AppResult sm_init(ScreenManager *sm, SDL_Renderer *renderer);
+
+void sm_cleanup(ScreenManager *sm);
 
 #endif

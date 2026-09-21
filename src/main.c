@@ -69,9 +69,7 @@ SDL_AppResult SDL_AppInit(void **appstate,
 
     ctx->last_time = SDL_GetTicks();
 
-    sm_register_screen(&ctx->screen_manager, SCREEN_START, StartScreen_Create());
-    sm_change_screen(&ctx->screen_manager, SCREEN_START);
-    sm_process_change(&ctx->screen_manager, ctx->renderer);
+    sm_init(&ctx->screen_manager, ctx->renderer);
 
     return SDL_APP_CONTINUE;
 }
@@ -151,7 +149,7 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result)
     {
         AppContext *ctx = (AppContext *)appstate;
 
-        sm_screen_cleanup(&ctx->screen_manager);
+        sm_cleanup(&ctx->screen_manager);
 
         SDL_DestroyRenderer(ctx->renderer);
         SDL_DestroyWindow(ctx->window);
