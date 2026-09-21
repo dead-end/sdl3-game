@@ -22,7 +22,7 @@ void sm_change_screen(ScreenManager *sm, ScreenType next)
 /**
  * The function processes the change of the screen.
  */
-void sm_process_change(ScreenManager *sm)
+void sm_process_change(ScreenManager *sm, SDL_Renderer *renderer)
 {
     Screen *current;
 
@@ -55,7 +55,7 @@ void sm_process_change(ScreenManager *sm)
     current = &(sm->screens[sm->current]);
     if (current->init)
     {
-        current->init(current->state, sm->renderer);
+        current->init(current->state, renderer);
     }
 }
 

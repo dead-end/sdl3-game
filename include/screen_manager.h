@@ -13,7 +13,6 @@ typedef enum
 
 typedef struct ScreenManager
 {
-    SDL_Renderer *renderer;
     int current;
     bool change;
     int next;
@@ -24,7 +23,7 @@ void sm_register_screen(ScreenManager *sm, ScreenType type, Screen screen);
 
 void sm_change_screen(ScreenManager *sm, ScreenType type);
 
-void sm_process_change(ScreenManager *sm);
+void sm_process_change(ScreenManager *sm, SDL_Renderer *renderer);
 
 SDL_AppResult sm_screen_event(ScreenManager *sm, SDL_Event *event);
 
