@@ -133,7 +133,8 @@ SDL_AppResult sm_init(SDL_Renderer *renderer)
     //
     // Register screens
     //
-    _register_screen(SCREEN_START, StartScreen_Create());
+    _register_screen(SCREEN_START, ScreenStart_Create());
+    _register_screen(SCREEN_GAME, ScreenGame_Create());
 
     //
     // Setup the initial screen
