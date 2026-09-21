@@ -18,6 +18,12 @@ git pull
 source ./emsdk_env.sh
 ```
 
+To build !! Does not work
+
+```sh
+embuilder build sdl3_ttf
+```
+
 ## VS Code
 
 VS Code does not find the sdl.h files, because they are installed with emsdk.
