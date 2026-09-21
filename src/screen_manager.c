@@ -3,7 +3,24 @@
 #include "screen.h"
 #include "screen_manager.h"
 
-static void _register_screen(ScreenManager *sm, ScreenType type, Screen screen)
+/**
+ * The struct for the ScreenManager is private.
+ */
+typedef struct ScreenManager
+{
+    int current;
+    // TODO: check if next is < 0
+    bool change;
+    int next;
+    Screen screens[_TOTAL_];
+} ScreenManager;
+
+static ScreenManager *sm = NULL;
+
+/**
+ * The function to register new Screens
+ */
+static void _register_screen(ScreenType type, Screen screen)
 {
     sm->screens[type] = screen;
 }
@@ -13,7 +30,7 @@ static void _register_screen(ScreenManager *sm, ScreenType type, Screen screen)
  * immediately. It will be processed at the beginning of the next frame, to
  * prevent errors.
  */
-void sm_change_screen(ScreenManager *sm, ScreenType next)
+void sm_change_screen(ScreenType next)
 {
     sm->next = next;
     sm->change = true;
@@ -22,7 +39,7 @@ void sm_change_screen(ScreenManager *sm, ScreenType next)
 /**
  * The function processes the change of the screen.
  */
-void sm_process_change(ScreenManager *sm, SDL_Renderer *renderer)
+void sm_process_change(SDL_Renderer *renderer)
 {
     Screen *current;
 
@@ -62,7 +79,7 @@ void sm_process_change(ScreenManager *sm, SDL_Renderer *renderer)
 /**
  * The function calls the event function of the screen.
  */
-SDL_AppResult sm_screen_event(ScreenManager *sm, SDL_Event *event)
+SDL_AppResult sm_screen_event(SDL_Event *event)
 {
     Screen *current = &(sm->screens[sm->current]);
     if (current->event)
@@ -75,7 +92,7 @@ SDL_AppResult sm_screen_event(ScreenManager *sm, SDL_Event *event)
 /**
  * The function calls the update function of the screen.
  */
-SDL_AppResult sm_screen_update(ScreenManager *sm, double delta_time)
+SDL_AppResult sm_screen_update(double delta_time)
 {
     Screen *current = &(sm->screens[sm->current]);
     if (current->update)
@@ -88,7 +105,7 @@ SDL_AppResult sm_screen_update(ScreenManager *sm, double delta_time)
 /**
  * The function calls the render function of the screen.
  */
-SDL_AppResult sm_screen_render(ScreenManager *sm, SDL_Renderer *renderer)
+SDL_AppResult sm_screen_render(SDL_Renderer *renderer)
 {
     Screen *current = &(sm->screens[sm->current]);
     if (current->render)
@@ -99,22 +116,53 @@ SDL_AppResult sm_screen_render(ScreenManager *sm, SDL_Renderer *renderer)
 }
 
 /**
+ * The function initializes the ScreenManager.
+ */
+SDL_AppResult sm_init(SDL_Renderer *renderer)
+{
+    //
+    // Allocate memory
+    //
+    sm = SDL_calloc(1, sizeof(ScreenManager));
+    if (!sm)
+    {
+        SDL_Log("Unable to allocate ScreenManager");
+        return SDL_APP_FAILURE;
+    }
+
+    //
+    // Register screens
+    //
+    _register_screen(SCREEN_START, StartScreen_Create());
+
+    //
+    // Setup the initial screen
+    //
+    sm_change_screen(SCREEN_START);
+    sm_process_change(renderer);
+
+    return SDL_APP_CONTINUE;
+}
+
+/**
  * The function calls the cleanup function of the screen.
  */
-void sm_cleanup(ScreenManager *sm)
+void sm_cleanup()
 {
+    if (!sm)
+    {
+        return;
+    }
+
+    //
+    // Call the cleanup function of the current screen
+    //
     Screen *current = &(sm->screens[sm->current]);
     if (current->cleanup)
     {
         current->cleanup(current->state);
     }
-}
 
-SDL_AppResult sm_init(ScreenManager *sm, SDL_Renderer *renderer)
-{
-    _register_screen(sm, SCREEN_START, StartScreen_Create());
-    sm_change_screen(sm, SCREEN_START);
-    sm_process_change(sm, renderer);
-
-    return SDL_APP_CONTINUE;
+    SDL_free(sm);
+    sm = NULL;
 }

@@ -11,26 +11,18 @@ typedef enum
     _TOTAL_
 } ScreenType;
 
-typedef struct ScreenManager
-{
-    int current;
-    bool change;
-    int next;
-    Screen screens[_TOTAL_];
-} ScreenManager;
+void sm_change_screen(ScreenType type);
 
-void sm_change_screen(ScreenManager *sm, ScreenType type);
+void sm_process_change(SDL_Renderer *renderer);
 
-void sm_process_change(ScreenManager *sm, SDL_Renderer *renderer);
+SDL_AppResult sm_screen_event(SDL_Event *event);
 
-SDL_AppResult sm_screen_event(ScreenManager *sm, SDL_Event *event);
+SDL_AppResult sm_screen_update(double delta_time);
 
-SDL_AppResult sm_screen_update(ScreenManager *sm, double delta_time);
+SDL_AppResult sm_screen_render(SDL_Renderer *renderer);
 
-SDL_AppResult sm_screen_render(ScreenManager *sm, SDL_Renderer *renderer);
+SDL_AppResult sm_init(SDL_Renderer *renderer);
 
-SDL_AppResult sm_init(ScreenManager *sm, SDL_Renderer *renderer);
-
-void sm_cleanup(ScreenManager *sm);
+void sm_cleanup();
 
 #endif
