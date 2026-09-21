@@ -69,10 +69,9 @@ SDL_AppResult SDL_AppInit(void **appstate,
 
     ctx->last_time = SDL_GetTicks();
 
-    ctx->screen_manager.renderer = ctx->renderer;
     sm_register_screen(&ctx->screen_manager, SCREEN_START, StartScreen_Create());
     sm_change_screen(&ctx->screen_manager, SCREEN_START);
-    sm_process_change(&ctx->screen_manager);
+    sm_process_change(&ctx->screen_manager, ctx->renderer);
 
     return SDL_APP_CONTINUE;
 }
@@ -104,7 +103,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     //
     // Process pending screen changes
     //
-    sm_process_change(sm);
+    sm_process_change(sm, ctx->renderer);
 
     //
     // Compute delta time
@@ -125,16 +124,16 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     //
     // Rendering
     //
-    SDL_SetRenderDrawColor(sm->renderer, 0, 0, 0, 255);
-    SDL_RenderClear(sm->renderer);
+    SDL_SetRenderDrawColor(ctx->renderer, 0, 0, 0, 255);
+    SDL_RenderClear(ctx->renderer);
 
-    res = sm_screen_render(sm, sm->renderer);
+    res = sm_screen_render(sm, ctx->renderer);
     if (res != SDL_APP_CONTINUE)
     {
         return res;
     }
 
-    SDL_RenderPresent(sm->renderer);
+    SDL_RenderPresent(ctx->renderer);
     return SDL_APP_CONTINUE;
 }
 
