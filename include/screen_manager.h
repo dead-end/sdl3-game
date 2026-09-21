@@ -4,12 +4,7 @@
 #include <SDL3/SDL.h>
 
 #include "screen.h"
-
-typedef enum
-{
-    SCREEN_START,
-    _TOTAL_
-} ScreenType;
+#include "screens.h"
 
 void sm_change_screen(ScreenType type);
 
