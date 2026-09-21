@@ -21,11 +21,17 @@ static SDL_AppResult _event(void *state, SDL_Event *event)
 {
     if (event->type == SDL_EVENT_KEY_DOWN)
     {
-        if (event->key.key == SDLK_ESCAPE)
+        switch (event->key.key)
         {
-            // Wenn ENTER gedrückt wird: Wechsel zum Gameplay-Screen
-            // (Hinweis: Dafür müsste der ScreenManager-Zeiger im State erreichbar sein)
+        case SDLK_ESCAPE:
             return SDL_APP_SUCCESS;
+            break;
+        case SDLK_SPACE:
+            return SDL_APP_SUCCESS;
+            break;
+
+        default:
+            break;
         }
     }
     return SDL_APP_CONTINUE;
@@ -33,11 +39,10 @@ static SDL_AppResult _event(void *state, SDL_Event *event)
 
 static SDL_AppResult _update(void *state, double delta_time)
 {
+    SDL_Log("start screen update");
     State *m_state = (State *)state;
 
     m_state->r += m_state->direction * delta_time * 100;
-
-    SDL_Log("direction: %d delta-time: %f rot: %d", m_state->direction, delta_time, m_state->r);
 
     if (m_state->r > 255)
     {
@@ -56,6 +61,7 @@ static SDL_AppResult _update(void *state, double delta_time)
 
 static SDL_AppResult _render(void *state, SDL_Renderer *renderer)
 {
+    SDL_Log("start screen render");
     State *m_state = (State *)state;
 
     SDL_SetRenderDrawColor(renderer, m_state->r, 0, 0, 255);
@@ -73,19 +79,27 @@ static SDL_AppResult _render(void *state, SDL_Renderer *renderer)
     // Nutzen Sie SDL_RenderFillRect für ein ausgefülltes Rechteck:
     SDL_RenderFillRect(renderer, &my_rect);
 
+    SDL_SetRenderDrawColor(renderer, 200, 200, 200, 255);
+
+    if (!SDL_RenderDebugText(renderer, 10.0, 10.0, "Press space to continue ..."))
+    {
+        SDL_Log("Unable to write text");
+        return SDL_APP_FAILURE;
+    }
+
     return SDL_APP_CONTINUE;
 }
 
 static void _cleanup(void *state)
 {
+    SDL_Log("start screen cleanup");
     SDL_free(state);
 }
 
 // Factory-Funktion zum Erstellen des Screens
 Screen StartScreen_Create(void)
 {
-
-    SDL_Log("created start screen");
+    SDL_Log("start screen created");
 
     Screen s = {0};
     s.state = SDL_calloc(1, sizeof(State));
