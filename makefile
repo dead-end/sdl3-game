@@ -17,7 +17,8 @@ BUILD_TYPE ?= Release
 SRC_FILES = src/main.c \
 			src/log.c \
             src/screen_manager.c \
-            src/start_screen.c
+            src/screen_start.c \
+			src/screen_game.c
 
 # ------------------------------------------------------------------------------
 # WebAssembly & SDL3 Linker-Flags
