@@ -55,6 +55,13 @@ static SDL_AppResult _app_init(AppContext **ctx)
         return SDL_APP_FAILURE;
     }
 
+    //
+    // The function enables vertical synchronization (VSync) for the specified
+    // renderer, locking the application's frame rate to the monitor's refresh
+    // rate to prevent screen tearing and excessive resource usage.
+    //
+    SDL_SetRenderVSync((*ctx)->renderer, 1);
+
     sm_init((*ctx)->renderer);
 
     (*ctx)->last_time = SDL_GetTicks();
@@ -130,9 +137,6 @@ static SDL_AppResult _app_update(AppContext *ctx)
     uint64_t now = SDL_GetTicks();
     double delta_time = (double)(now - ctx->last_time) / 1000.0;
     ctx->last_time = now;
-
-    // TODO: Triggers the update ???
-    SDL_Log("_app_update");
 
     return sm_screen_update(delta_time);
 }
