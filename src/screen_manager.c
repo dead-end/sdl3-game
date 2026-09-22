@@ -39,7 +39,7 @@ void sm_change_screen(ScreenType next)
 /**
  * The function processes the change of the screen.
  */
-void sm_process_change(SDL_Renderer *renderer)
+SDL_AppResult sm_process_change(SDL_Renderer *renderer)
 {
     Screen *current;
 
@@ -48,7 +48,7 @@ void sm_process_change(SDL_Renderer *renderer)
     //
     if (!sm->change)
     {
-        return;
+        return SDL_APP_CONTINUE;
     }
 
     //
@@ -57,7 +57,7 @@ void sm_process_change(SDL_Renderer *renderer)
     current = &(sm->screens[sm->current]);
     if (current->cleanup)
     {
-        current->cleanup(current->state);
+        current->cleanup();
     }
 
     //
@@ -72,8 +72,10 @@ void sm_process_change(SDL_Renderer *renderer)
     current = &(sm->screens[sm->current]);
     if (current->init)
     {
-        current->init(current->state, renderer);
+        return current->init(renderer);
     }
+
+    return SDL_APP_CONTINUE;
 }
 
 /**
@@ -84,7 +86,7 @@ SDL_AppResult sm_screen_event(SDL_Event *event)
     Screen *current = &(sm->screens[sm->current]);
     if (current->event)
     {
-        return current->event(current->state, event);
+        return current->event(event);
     }
     return SDL_APP_CONTINUE;
 }
@@ -97,7 +99,7 @@ SDL_AppResult sm_screen_update(double delta_time)
     Screen *current = &(sm->screens[sm->current]);
     if (current->update)
     {
-        return current->update(current->state, delta_time);
+        return current->update(delta_time);
     }
     return SDL_APP_CONTINUE;
 }
@@ -110,7 +112,7 @@ SDL_AppResult sm_screen_render(SDL_Renderer *renderer)
     Screen *current = &(sm->screens[sm->current]);
     if (current->render)
     {
-        return current->render(current->state, renderer);
+        return current->render(renderer);
     }
     return SDL_APP_CONTINUE;
 }
@@ -140,9 +142,7 @@ SDL_AppResult sm_init(SDL_Renderer *renderer)
     // Setup the initial screen
     //
     sm_change_screen(SCREEN_START);
-    sm_process_change(renderer);
-
-    return SDL_APP_CONTINUE;
+    return sm_process_change(renderer);
 }
 
 /**
@@ -161,7 +161,7 @@ void sm_cleanup()
     Screen *current = &(sm->screens[sm->current]);
     if (current->cleanup)
     {
-        current->cleanup(current->state);
+        current->cleanup();
     }
 
     SDL_free(sm);

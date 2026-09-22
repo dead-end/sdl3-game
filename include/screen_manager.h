@@ -8,7 +8,7 @@
 
 void sm_change_screen(ScreenType type);
 
-void sm_process_change(SDL_Renderer *renderer);
+SDL_AppResult sm_process_change(SDL_Renderer *renderer);
 
 SDL_AppResult sm_screen_event(SDL_Event *event);
 
