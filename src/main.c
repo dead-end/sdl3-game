@@ -37,19 +37,27 @@ static SDL_AppResult _app_init(AppContext **ctx)
 
     if (!SDL_Init(SDL_INIT_VIDEO))
     {
-        SDL_Log("Unable to initialize video: %s", SDL_GetError());
+        SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
 
-    if (!SDL_CreateWindowAndRenderer("SDL3 Game", 800, 600, 0, &(*ctx)->window, &(*ctx)->renderer))
+    (*ctx)->window = SDL_CreateWindow("SDL3 Game", 800, 600, 0);
+    if ((*ctx)->window == NULL)
     {
-        SDL_Log("Unable to initialize window / renderer: %s", SDL_GetError());
+        SDL_Log("Unable to create window: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
 
-    (*ctx)->last_time = SDL_GetTicks();
+    (*ctx)->renderer = SDL_CreateRenderer((*ctx)->window, NULL);
+    if ((*ctx)->renderer == NULL)
+    {
+        SDL_Log("Unable to create renderer: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
 
     sm_init((*ctx)->renderer);
+
+    (*ctx)->last_time = SDL_GetTicks();
 
     return SDL_APP_CONTINUE;
 }
@@ -63,9 +71,6 @@ static void _app_cleanup(AppContext **ctx)
 {
     if (ctx && *ctx)
     {
-
-        sm_cleanup();
-
         if ((*ctx)->renderer)
         {
             SDL_DestroyRenderer((*ctx)->renderer);
@@ -81,6 +86,8 @@ static void _app_cleanup(AppContext **ctx)
         SDL_free(*ctx);
         *ctx = NULL;
     }
+
+    sm_cleanup();
 
     log_cleanup();
 
