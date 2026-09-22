@@ -172,9 +172,7 @@ static void _main_loop_step(void *arg)
     //
     if (SDL_APP_CONTINUE != _app_event(*ctx))
     {
-        _app_cleanup(ctx);
-        emscripten_cancel_main_loop();
-        return;
+        goto error_cleanup;
     }
 
     //
@@ -182,9 +180,7 @@ static void _main_loop_step(void *arg)
     //
     if (SDL_APP_CONTINUE != sm_process_change((*ctx)->renderer))
     {
-        _app_cleanup(ctx);
-        emscripten_cancel_main_loop();
-        return;
+        goto error_cleanup;
     }
 
     //
@@ -192,9 +188,7 @@ static void _main_loop_step(void *arg)
     //
     if (SDL_APP_CONTINUE != _app_update(*ctx))
     {
-        _app_cleanup(ctx);
-        emscripten_cancel_main_loop();
-        return;
+        goto error_cleanup;
     }
 
     //
@@ -202,10 +196,15 @@ static void _main_loop_step(void *arg)
     //
     if (SDL_APP_CONTINUE != _app_render(*ctx))
     {
-        _app_cleanup(ctx);
-        emscripten_cancel_main_loop();
-        return;
+        goto error_cleanup;
     }
+
+    return;
+
+error_cleanup:
+
+    _app_cleanup(ctx);
+    emscripten_cancel_main_loop();
 }
 
 /**
