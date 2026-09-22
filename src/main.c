@@ -100,6 +100,8 @@ static void _app_cleanup(AppContext **ctx)
  */
 static SDL_AppResult _app_event(AppContext *ctx)
 {
+    (void)ctx;
+
     SDL_Event event;
 
     while (SDL_PollEvent(&event))
@@ -128,6 +130,9 @@ static SDL_AppResult _app_update(AppContext *ctx)
     uint64_t now = SDL_GetTicks();
     double delta_time = (double)(now - ctx->last_time) / 1000.0;
     ctx->last_time = now;
+
+    // TODO: Triggers the update ???
+    SDL_Log("_app_update");
 
     return sm_screen_update(delta_time);
 }
@@ -171,7 +176,12 @@ static void _main_loop_step(void *arg)
     //
     // Change the sceen
     //
-    sm_process_change((*ctx)->renderer);
+    if (SDL_APP_CONTINUE != sm_process_change((*ctx)->renderer))
+    {
+        _app_cleanup(ctx);
+        emscripten_cancel_main_loop();
+        return;
+    }
 
     //
     // Update the app
