@@ -2,11 +2,13 @@
 
 #include "screen_manager.h"
 #include "screen.h"
+#include "drawable.h"
+
+#define NUM_DRAWABLES 3
 
 typedef struct State
 {
-    int r;
-    int direction;
+    Drawable drawables[NUM_DRAWABLES];
 
 } State;
 
@@ -28,8 +30,22 @@ static SDL_AppResult _init(SDL_Renderer *renderer)
         return SDL_APP_FAILURE;
     }
 
-    _state->r = 100;
-    _state->direction = 1;
+    _state->drawables[0] = Background_Create();
+    _state->drawables[1] = Stars_Create();
+    _state->drawables[2] = Hexagons_Create();
+
+    for (int i = 0; i < NUM_DRAWABLES; i++)
+    {
+        if (_state->drawables[i].init)
+        {
+            SDL_AppResult result = _state->drawables[i].init(renderer);
+            if (result != SDL_APP_CONTINUE)
+            {
+                return result;
+            }
+        }
+    }
+
     return SDL_APP_CONTINUE;
 }
 
@@ -63,22 +79,17 @@ static SDL_AppResult _event(SDL_Event *event)
  */
 static SDL_AppResult _update(double delta_time)
 {
-    //    SDL_Log("update");
-
-    _state->r += _state->direction * delta_time * 100;
-
-    if (_state->r > 255)
+    for (int i = 0; i < NUM_DRAWABLES; i++)
     {
-        _state->r = 255;
-        _state->direction = -1;
+        if (_state->drawables[i].update)
+        {
+            SDL_AppResult result = _state->drawables[i].update(delta_time);
+            if (result != SDL_APP_CONTINUE)
+            {
+                return result;
+            }
+        }
     }
-
-    if (_state->r < 0)
-    {
-        _state->r = 0;
-        _state->direction = 1;
-    }
-
     return SDL_APP_CONTINUE;
 }
 
@@ -88,34 +99,16 @@ static SDL_AppResult _update(double delta_time)
 static SDL_AppResult _render(SDL_Renderer *renderer)
 {
 
-    if (!SDL_SetRenderDrawColor(renderer, 0, _state->r, 0, 255))
+    for (int i = 0; i < NUM_DRAWABLES; i++)
     {
-        SDL_Log("SDL_SetRenderDrawColor: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
-
-    SDL_FRect my_rect = {
-        .x = 0.0f,
-        .y = 0.0f,
-        .w = 100.0f,
-        .h = 100.0f};
-
-    if (!SDL_RenderFillRect(renderer, &my_rect))
-    {
-        SDL_Log("SDL_RenderFillRect: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
-
-    if (!SDL_SetRenderDrawColor(renderer, 200, 200, 200, 255))
-    {
-        SDL_Log("SDL_SetRenderDrawColor: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
-
-    if (!SDL_RenderDebugText(renderer, 10.0, 10.0, "Press space to continue ..."))
-    {
-        SDL_Log("SDL_RenderDebugText: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
+        if (_state->drawables[i].render)
+        {
+            SDL_AppResult result = _state->drawables[i].render(renderer);
+            if (result != SDL_APP_CONTINUE)
+            {
+                return result;
+            }
+        }
     }
 
     return SDL_APP_CONTINUE;
@@ -131,6 +124,14 @@ static void _cleanup()
     if (!_state)
     {
         return;
+    }
+
+    for (int i = 0; i < NUM_DRAWABLES; i++)
+    {
+        if (_state->drawables[i].cleanup)
+        {
+            _state->drawables[i].cleanup();
+        }
     }
 
     SDL_free(_state);

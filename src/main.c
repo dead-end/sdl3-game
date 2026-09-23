@@ -1,8 +1,9 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <emscripten.h>
+
 #include <stdio.h>
 #include <stdbool.h>
-#include <emscripten.h>
 
 #include "screen_manager.h"
 #include "log.h"
@@ -176,7 +177,7 @@ static void _main_loop_step(void *arg)
     }
 
     //
-    // Change the sceen
+    // Change the screen
     //
     if (SDL_APP_CONTINUE != sm_process_change((*ctx)->renderer))
     {
