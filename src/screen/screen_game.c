@@ -4,7 +4,7 @@
 #include "screen.h"
 #include "drawable.h"
 
-#define NUM_DRAWABLES 3
+#define NUM_DRAWABLES 2
 
 typedef struct State
 {
@@ -32,7 +32,6 @@ static SDL_AppResult _init(SDL_Renderer *renderer)
 
     _state->drawables[0] = Background_Create();
     _state->drawables[1] = Stars_Create();
-    _state->drawables[2] = Hexagons_Create();
 
     for (int i = 0; i < NUM_DRAWABLES; i++)
     {

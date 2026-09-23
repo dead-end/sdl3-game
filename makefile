@@ -20,8 +20,7 @@ SRC_FILES = src/main.c \
             src/screen/screen_start.c \
 			src/screen/screen_game.c \
             src/drawable/background.c \
-            src/drawable/stars.c \
-            src/drawable/hexagons.c
+            src/drawable/stars.c 
 
 # ------------------------------------------------------------------------------
 # WebAssembly & SDL3 Linker-Flags

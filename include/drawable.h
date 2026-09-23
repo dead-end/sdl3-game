@@ -18,6 +18,4 @@ Drawable Background_Create();
 
 Drawable Stars_Create();
 
-Drawable Hexagons_Create();
-
 #endif
