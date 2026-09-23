@@ -4,7 +4,6 @@
 #include <SDL3/SDL.h>
 
 #include "screen.h"
-#include "screens.h"
 
 void sm_change_screen(ScreenType type);
 

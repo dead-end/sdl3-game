@@ -17,4 +17,15 @@ typedef struct Screen
     void (*cleanup)();
 } Screen;
 
+typedef enum
+{
+    SCREEN_START,
+    SCREEN_GAME,
+    _TOTAL_
+} ScreenType;
+
+Screen ScreenStart_Create(void);
+
+Screen ScreenGame_Create(void);
+
 #endif
