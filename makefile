@@ -15,10 +15,13 @@ BUILD_TYPE ?= Release
 
 # Source files
 SRC_FILES = src/main.c \
-			src/log.c \
-            src/screen_manager.c \
-            src/screen_start.c \
-			src/screen_game.c
+			src/misc/log.c \
+            src/screen/screen_manager.c \
+            src/screen/screen_start.c \
+			src/screen/screen_game.c \
+            src/drawable/background.c \
+            src/drawable/stars.c \
+            src/drawable/hexagons.c
 
 # ------------------------------------------------------------------------------
 # WebAssembly & SDL3 Linker-Flags
