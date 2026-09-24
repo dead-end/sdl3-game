@@ -3,20 +3,19 @@
 
 #include <SDL3/SDL.h>
 
+#include "camera.h"
+
 typedef struct GameState
 {
     SDL_Renderer *renderer;
 
-    SDL_FRect camera;
+    Camera camera;
 
-    // TODO: maybe FSize
     float board_w;
     float board_h;
 } GameState;
 
 SDL_AppResult gs_init(GameState *gs, SDL_Renderer *renderer);
-
-void gs_camera_move(GameState *gs, float rel_x, float rel_y);
 
 SDL_FPoint gs_board_to_camera(float board_x, float board_y, float camera_x, float camera_y);
 
