@@ -6,18 +6,8 @@
  * The function renders the drawable. It uses SDL_RenderGeometry. SDL3 has no
  * gradient.
  */
-static SDL_AppResult _render(SDL_Renderer *renderer)
+static SDL_AppResult _render(GameState *gs)
 {
-    int w, h;
-    if (!SDL_GetRenderOutputSize(renderer, &w, &h))
-    {
-        SDL_Log("SDL_GetRenderOutputSize: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
-
-    float width = (float)w;
-    float height = (float)h;
-
     SDL_FColor colorTop = {0.04f, 0.06f, 0.18f, 1.0f};
     SDL_FColor colorBottom = {0.00f, 0.00f, 0.00f, 1.0f};
 
@@ -29,18 +19,18 @@ static SDL_AppResult _render(SDL_Renderer *renderer)
     vertices[0].color = colorTop;
 
     // top right
-    vertices[1].position.x = width;
+    vertices[1].position.x = gs->camera.w;
     vertices[1].position.y = 0.0f;
     vertices[1].color = colorTop;
 
     // bottom right
-    vertices[2].position.x = width;
-    vertices[2].position.y = height;
+    vertices[2].position.x = gs->camera.w;
+    vertices[2].position.y = gs->camera.h;
     vertices[2].color = colorBottom;
 
     // bottom left
     vertices[3].position.x = 0.0f;
-    vertices[3].position.y = height;
+    vertices[3].position.y = gs->camera.h;
     vertices[3].color = colorBottom;
 
     //
@@ -53,7 +43,7 @@ static SDL_AppResult _render(SDL_Renderer *renderer)
     //
     // Renders triangles
     //
-    if (!SDL_RenderGeometry(renderer, NULL, vertices, 4, indices, 6))
+    if (!SDL_RenderGeometry(gs->renderer, NULL, vertices, 4, indices, 6))
     {
         SDL_Log("SDL_RenderGeometry: %s", SDL_GetError());
         return SDL_APP_FAILURE;

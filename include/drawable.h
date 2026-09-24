@@ -3,13 +3,15 @@
 
 #include <SDL3/SDL.h>
 
+#include "game_state.h"
+
 typedef struct Drawable
 {
-    SDL_AppResult (*init)(SDL_Renderer *renderer);
+    SDL_AppResult (*init)(GameState *gs);
 
-    SDL_AppResult (*update)(double delta_time);
+    SDL_AppResult (*update)(GameState *gs, double delta_time);
 
-    SDL_AppResult (*render)(SDL_Renderer *renderer);
+    SDL_AppResult (*render)(GameState *gs);
 
     void (*cleanup)();
 } Drawable;
