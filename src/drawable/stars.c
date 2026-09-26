@@ -69,6 +69,8 @@ static void _cleanup()
  */
 static SDL_AppResult _update(GameState *gs, double delta_time)
 {
+    (void)delta_time;
+
     //
     // If the camera did not change, we have nothing to do.
     //
