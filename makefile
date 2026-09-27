@@ -16,13 +16,18 @@ BUILD_TYPE ?= Release
 # Source files
 SRC_FILES = src/main.c \
 			src/misc/log.c \
+            src/hexagon/hex_center.c \
+            src/hexagon/hex_corners.c \
+            src/hexagon/hex_neighbor.c \
             src/screen/screen_manager.c \
             src/screen/screen_start.c \
 			src/screen/screen_game.c \
             src/drawable/background.c \
             src/drawable/stars.c \
+            src/drawable/hexagons.c \
             src/game/game_state.c \
-            src/game/camera.c
+            src/game/camera.c \
+            src/game/field.c \
 
 # ------------------------------------------------------------------------------
 # WebAssembly & SDL3 Linker-Flags
@@ -37,7 +42,7 @@ WASM_FLAGS = -sUSE_SDL=3 \
 # Build-Type specific flags (optimizations vs. debugging)
 ifeq ($(BUILD_TYPE), Release)
     CFLAGS += -O3
-    WASM_FLAGS += -O3 -sMINIFY_HTML=1
+    WASM_FLAGS += -O3 -sMINIFY_HTML=1 -DSDL_ASSERT_LEVEL=0
 else
     CFLAGS += -g -O0 -gsource-map
     WASM_FLAGS += -g -O0 -gsource-map -sASSERTIONS=2 -sSAFE_HEAP=1

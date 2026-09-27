@@ -4,9 +4,11 @@
 #include "screen.h"
 #include "drawable.h"
 #include "game_state.h"
+#include "field.h"
 
-#define NUM_DRAWABLES 2
+#define NUM_DRAWABLES 3
 
+// TODO: maybe we can store the parameter separately.
 typedef struct State
 {
     Drawable drawables[NUM_DRAWABLES];
@@ -42,8 +44,18 @@ static SDL_AppResult _init(SDL_Renderer *renderer)
         return result;
     }
 
+    //
+    // The fields are allocated separately
+    //
+    result = field_init(&_state->gs);
+    if (SDL_APP_CONTINUE != result)
+    {
+        return result;
+    }
+
     _state->drawables[0] = Background_Create();
     _state->drawables[1] = Stars_Create();
+    _state->drawables[2] = Hexagons_Create();
 
     for (int i = 0; i < NUM_DRAWABLES; i++)
     {
@@ -139,6 +151,7 @@ static SDL_AppResult _update(double delta_time)
  */
 static SDL_AppResult _render(SDL_Renderer *renderer)
 {
+    (void)renderer; // TODO: only in the init call. Each screen has a state.
 
     for (int i = 0; i < NUM_DRAWABLES; i++)
     {
@@ -174,6 +187,11 @@ static void _cleanup()
             _state->drawables[i].cleanup();
         }
     }
+
+    //
+    // The fields are allocated separately
+    //
+    field_cleanup(&_state->gs);
 
     SDL_free(_state);
     _state = NULL;
