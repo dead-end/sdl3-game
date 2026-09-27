@@ -107,12 +107,12 @@ SDL_AppResult sm_screen_update(double delta_time)
 /**
  * The function calls the render function of the screen.
  */
-SDL_AppResult sm_screen_render(SDL_Renderer *renderer)
+SDL_AppResult sm_screen_render()
 {
     Screen *current = &(sm->screens[sm->current]);
     if (current->render)
     {
-        return current->render(renderer);
+        return current->render();
     }
     return SDL_APP_CONTINUE;
 }

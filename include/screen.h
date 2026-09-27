@@ -12,7 +12,7 @@ typedef struct Screen
 
     SDL_AppResult (*update)(double delta_time);
 
-    SDL_AppResult (*render)(SDL_Renderer *renderer);
+    SDL_AppResult (*render)();
 
     void (*cleanup)();
 } Screen;

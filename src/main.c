@@ -150,7 +150,7 @@ static SDL_AppResult _app_render(AppContext *ctx)
     SDL_SetRenderDrawColor(ctx->renderer, 0, 0, 0, 255);
     SDL_RenderClear(ctx->renderer);
 
-    SDL_AppResult render_res = sm_screen_render(ctx->renderer);
+    SDL_AppResult render_res = sm_screen_render();
     if (render_res != SDL_APP_CONTINUE)
     {
         return render_res;

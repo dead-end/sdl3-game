@@ -13,7 +13,7 @@ SDL_AppResult sm_screen_event(SDL_Event *event);
 
 SDL_AppResult sm_screen_update(double delta_time);
 
-SDL_AppResult sm_screen_render(SDL_Renderer *renderer);
+SDL_AppResult sm_screen_render();
 
 SDL_AppResult sm_init(SDL_Renderer *renderer);
 

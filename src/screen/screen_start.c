@@ -5,6 +5,7 @@
 
 typedef struct State
 {
+    SDL_Renderer *renderer;
     int r;
     int direction;
 
@@ -17,8 +18,6 @@ static State *_state = NULL;
  */
 static SDL_AppResult _init(SDL_Renderer *renderer)
 {
-    (void)renderer;
-
     SDL_Log("StartScreen: init");
 
     _state = SDL_calloc(1, sizeof(State));
@@ -28,6 +27,7 @@ static SDL_AppResult _init(SDL_Renderer *renderer)
         return SDL_APP_FAILURE;
     }
 
+    _state->renderer = renderer;
     _state->r = 100;
     _state->direction = 1;
     return SDL_APP_CONTINUE;
@@ -84,9 +84,9 @@ static SDL_AppResult _update(double delta_time)
 /**
  * The render function for the screen.
  */
-static SDL_AppResult _render(SDL_Renderer *renderer)
+static SDL_AppResult _render()
 {
-    if (!SDL_SetRenderDrawColor(renderer, _state->r, 0, 0, 255))
+    if (!SDL_SetRenderDrawColor(_state->renderer, _state->r, 0, 0, 255))
     {
         SDL_Log("SDL_SetRenderDrawColor: %s", SDL_GetError());
         return SDL_APP_FAILURE;
@@ -98,19 +98,19 @@ static SDL_AppResult _render(SDL_Renderer *renderer)
         .w = 100.0f,
         .h = 100.0f};
 
-    if (!SDL_RenderFillRect(renderer, &my_rect))
+    if (!SDL_RenderFillRect(_state->renderer, &my_rect))
     {
         SDL_Log("SDL_RenderFillRect: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
 
-    if (!SDL_SetRenderDrawColor(renderer, 200, 200, 200, 255))
+    if (!SDL_SetRenderDrawColor(_state->renderer, 200, 200, 200, 255))
     {
         SDL_Log("SDL_SetRenderDrawColor: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
 
-    if (!SDL_RenderDebugText(renderer, 10.0, 10.0, "Press space to continue ..."))
+    if (!SDL_RenderDebugText(_state->renderer, 10.0, 10.0, "Press space to continue ..."))
     {
         SDL_Log("SDL_RenderDebugText: %s", SDL_GetError());
         return SDL_APP_FAILURE;

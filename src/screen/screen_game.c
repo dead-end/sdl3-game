@@ -149,10 +149,8 @@ static SDL_AppResult _update(double delta_time)
 /**
  * The render function for the screen.
  */
-static SDL_AppResult _render(SDL_Renderer *renderer)
+static SDL_AppResult _render()
 {
-    (void)renderer; // TODO: only in the init call. Each screen has a state.
-
     for (int i = 0; i < NUM_DRAWABLES; i++)
     {
         if (_state->drawables[i].render)
