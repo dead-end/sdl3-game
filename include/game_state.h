@@ -23,6 +23,7 @@ typedef struct Field
 typedef struct GameState
 {
     SDL_Renderer *renderer;
+    Uint32 pixelFormat;
 
     Camera camera;
 

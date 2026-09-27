@@ -13,6 +13,23 @@ SDL_AppResult gs_init(GameState *gs, SDL_Renderer *renderer)
     gs->renderer = renderer;
 
     //
+    // Get the SDL_PixelFormat
+    //
+    SDL_Window *window = SDL_GetRenderWindow(gs->renderer);
+    if (window == NULL)
+    {
+        SDL_Log("SDL_RenderGetWindow: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
+
+    gs->pixelFormat = SDL_GetWindowPixelFormat(window);
+    if (SDL_PIXELFORMAT_UNKNOWN == gs->pixelFormat)
+    {
+        SDL_Log("SDL_GetWindowPixelFormat: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
+
+    //
     // Get the size of the screen for the camera
     //
     int w, h;

@@ -87,25 +87,11 @@ static SDL_AppResult _fields_render(GameState *gs)
 static SDL_AppResult _init(GameState *gs)
 {
     //
-    // Get the SDL_PixelFormat
+    // Create the texture
     //
-    SDL_Window *window = SDL_GetRenderWindow(gs->renderer);
-    if (window == NULL)
-    {
-        SDL_Log("SDL_RenderGetWindow: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
-
-    Uint32 systemFormat = SDL_GetWindowPixelFormat(window);
-    if (SDL_PIXELFORMAT_UNKNOWN == systemFormat)
-    {
-        SDL_Log("SDL_GetWindowPixelFormat: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
-
     _texture = SDL_CreateTexture(
         gs->renderer,
-        systemFormat,
+        gs->pixelFormat,
         SDL_TEXTUREACCESS_TARGET,
         gs->board_w,
         gs->board_h);
