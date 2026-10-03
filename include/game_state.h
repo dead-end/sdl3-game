@@ -67,6 +67,8 @@ typedef struct GameState
     //
     //
     Field **field;
+
+    SDL_FPoint field_origin;
 } GameState;
 
 #define SQRT_D_3 1.7320508075688772935
