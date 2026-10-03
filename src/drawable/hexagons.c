@@ -172,6 +172,7 @@ Drawable Hexagons_Create()
 
     Drawable d = {0};
     d.init = _init;
+    d.event = NULL;
     d.update = NULL;
     d.render = _render;
     d.cleanup = _cleanup;
