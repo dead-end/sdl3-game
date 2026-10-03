@@ -30,17 +30,6 @@ SDL_AppResult gs_init(GameState *gs, SDL_Renderer *renderer)
     }
 
     //
-    // Get the size of the screen for the camera
-    //
-    int w, h;
-    if (!SDL_GetRenderOutputSize(renderer, &w, &h))
-    {
-        SDL_Log("SDL_GetRenderOutputSize: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
-    camera_init(&gs->camera, w, h);
-
-    //
     // Compute the hexagon sizes
     //
     gs->size = 40;
