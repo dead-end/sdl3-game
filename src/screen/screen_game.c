@@ -6,7 +6,7 @@
 #include "game_state.h"
 #include "field.h"
 
-#define NUM_DRAWABLES 3
+#define NUM_DRAWABLES 5
 
 // TODO: maybe we can store the parameter separately.
 typedef struct State
@@ -17,8 +17,6 @@ typedef struct State
 } State;
 
 static State *_state = NULL;
-
-static bool _is_dragging = false;
 
 /**
  * The init function for the screen.
@@ -53,10 +51,15 @@ static SDL_AppResult _init(SDL_Renderer *renderer)
         return result;
     }
 
-    _state->drawables[0] = Background_Create();
-    _state->drawables[1] = Stars_Create();
-    _state->drawables[2] = Hexagons_Create();
+    _state->drawables[0] = Camera_Create();
+    _state->drawables[1] = Background_Create();
+    _state->drawables[2] = Stars_Create();
+    _state->drawables[3] = Hexagons_Create();
+    _state->drawables[4] = Ship_Create();
 
+    //
+    // Delegate the init call
+    //
     for (int i = 0; i < NUM_DRAWABLES; i++)
     {
         if (_state->drawables[i].init)
@@ -79,6 +82,9 @@ static SDL_AppResult _event(SDL_Event *event)
 {
     SDL_Log("GameScreen: event");
 
+    //
+    // Check for quit or screen change
+    //
     switch (event->type)
     {
     case SDL_EVENT_KEY_DOWN:
@@ -93,34 +99,25 @@ static SDL_AppResult _event(SDL_Event *event)
             break;
         }
         break;
-
-    case SDL_EVENT_MOUSE_BUTTON_DOWN:
-        if (event->button.button == SDL_BUTTON_LEFT)
-        {
-            _is_dragging = true;
-        }
-        break;
-
-    case SDL_EVENT_MOUSE_BUTTON_UP:
-        if (event->button.button == SDL_BUTTON_LEFT)
-        {
-            _is_dragging = false;
-        }
-        break;
-
-    case SDL_EVENT_MOUSE_MOTION:
-        if (_is_dragging)
-        {
-            //
-            // event.motion.xrel/yrel contains the movement of the mouse in
-            // pixel since the last frame.
-            //
-            camera_move(&_state->gs.camera,
-                        _state->gs.board_w, _state->gs.board_h,
-                        event->motion.xrel, event->motion.yrel);
-        }
-        break;
     }
+
+    //
+    // Delegate the event
+    //
+    SDL_AppResult result;
+
+    for (int i = 0; i < NUM_DRAWABLES; i++)
+    {
+        if (_state->drawables[i].event)
+        {
+            result = _state->drawables[i].event(&_state->gs, event);
+            if (result != SDL_APP_CONTINUE)
+            {
+                return result;
+            }
+        }
+    }
+
     return SDL_APP_CONTINUE;
 }
 
@@ -129,19 +126,19 @@ static SDL_AppResult _event(SDL_Event *event)
  */
 static SDL_AppResult _update(double delta_time)
 {
+    SDL_AppResult result;
+
     for (int i = 0; i < NUM_DRAWABLES; i++)
     {
         if (_state->drawables[i].update)
         {
-            SDL_AppResult result = _state->drawables[i].update(&_state->gs, delta_time);
+            result = _state->drawables[i].update(&_state->gs, delta_time);
             if (result != SDL_APP_CONTINUE)
             {
                 return result;
             }
         }
     }
-
-    camera_update_last(&_state->gs.camera);
 
     return SDL_APP_CONTINUE;
 }
@@ -151,11 +148,13 @@ static SDL_AppResult _update(double delta_time)
  */
 static SDL_AppResult _render()
 {
+    SDL_AppResult result;
+
     for (int i = 0; i < NUM_DRAWABLES; i++)
     {
         if (_state->drawables[i].render)
         {
-            SDL_AppResult result = _state->drawables[i].render(&_state->gs);
+            result = _state->drawables[i].render(&_state->gs);
             if (result != SDL_APP_CONTINUE)
             {
                 return result;
