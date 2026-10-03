@@ -1,7 +1,6 @@
 #include <SDL3/SDL.h>
 
 #include "drawable.h"
-#include "camera.h"
 
 #define MAX_SIZE 2
 
@@ -16,6 +15,39 @@ typedef struct
 static Star *_stars = NULL;
 
 static int _stars_num;
+
+static SDL_FPoint _camera_last;
+
+/**
+ * The function copies the current camera position to the last camera position.
+ */
+void _camera_set_last(GameState *gs)
+{
+    _camera_last.x = gs->camera.x;
+    _camera_last.y = gs->camera.y;
+}
+
+/**
+ * The function checks if the camera has moved.
+ */
+static bool _camera_has_moved(GameState *gs)
+{
+    return gs->camera.x != _camera_last.x ||
+           gs->camera.y != _camera_last.y;
+}
+
+/**
+ * The function returns the delta of the camera movement.
+ */
+static SDL_FPoint _camera_delta_move(GameState *gs)
+{
+    SDL_FPoint delta = {
+        .x = -gs->camera.x + _camera_last.x,
+        .y = -gs->camera.y + _camera_last.y,
+    };
+
+    return delta;
+}
 
 /**
  * The function initializes the drawable.
@@ -50,6 +82,11 @@ static SDL_AppResult _init(GameState *gs)
         _stars[i].alpha = SDL_rand(155) + 100;
     }
 
+    //
+    // Initialize the last camera position
+    //
+    _camera_set_last(gs);
+
     return SDL_APP_CONTINUE;
 }
 
@@ -74,12 +111,15 @@ static SDL_AppResult _update(GameState *gs, double delta_time)
     //
     // If the camera did not change, we have nothing to do.
     //
-    if (!camera_has_moved(&gs->camera))
+    if (!_camera_has_moved(gs))
     {
         return SDL_APP_CONTINUE;
     }
 
-    SDL_FPoint delta = camera_delta_move(&gs->camera);
+    //
+    // Get the relative camera position change
+    //
+    SDL_FPoint delta = _camera_delta_move(gs);
 
     SDL_Log("moved: %f %f", delta.x, delta.y);
 
@@ -105,6 +145,11 @@ static SDL_AppResult _update(GameState *gs, double delta_time)
         _stars[i].x = new_star_pos.x;
         _stars[i].y = new_star_pos.y;
     }
+
+    //
+    // update the last camera position
+    //
+    _camera_set_last(gs);
 
     return SDL_APP_CONTINUE;
 }
@@ -150,6 +195,7 @@ Drawable Stars_Create()
 
     Drawable d = {0};
     d.init = _init;
+    d.event = NULL;
     d.update = _update;
     d.render = _render;
     d.cleanup = _cleanup;
