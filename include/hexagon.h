@@ -11,4 +11,6 @@ SDL_FPoint hex_corner(const GameState *gs, const SDL_FPoint hex_center, const in
 
 SDL_Point hex_neighbor(const SDL_Point hex, const int i);
 
+SDL_Point hex_from_pixel(const GameState *gs, SDL_FPoint mouseRel);
+
 #endif
