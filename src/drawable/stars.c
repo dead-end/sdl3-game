@@ -77,7 +77,7 @@ static SDL_AppResult _init(GameState *gs)
 
         _stars[i].x = SDL_rand(gs->camera.w);
         _stars[i].y = SDL_rand(gs->camera.h);
-        _stars[i].speed = SDL_randf();
+        _stars[i].speed = 0.2 * SDL_randf();
         _stars[i].size = SDL_rand(MAX_SIZE) + 1;
         _stars[i].alpha = SDL_rand(155) + 100;
     }
