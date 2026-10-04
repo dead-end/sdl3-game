@@ -9,6 +9,8 @@ typedef struct Drawable
 {
     SDL_AppResult (*init)(GameState *gs);
 
+    SDL_AppResult (*event)(GameState *gs, SDL_Event *event);
+
     SDL_AppResult (*update)(GameState *gs, double delta_time);
 
     SDL_AppResult (*render)(GameState *gs);
@@ -16,10 +18,14 @@ typedef struct Drawable
     void (*cleanup)();
 } Drawable;
 
+Drawable Camera_Create();
+
 Drawable Background_Create();
 
 Drawable Stars_Create();
 
 Drawable Hexagons_Create();
+
+Drawable Spaceship_Create();
 
 #endif
