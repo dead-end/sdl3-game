@@ -3,8 +3,6 @@
 
 #include <SDL3/SDL.h>
 
-#include "camera.h"
-
 /**
  * The definition of the field.
  *
@@ -25,7 +23,7 @@ typedef struct GameState
     SDL_Renderer *renderer;
     Uint32 pixelFormat;
 
-    Camera camera;
+    SDL_FRect camera;
 
     float board_w;
     float board_h;

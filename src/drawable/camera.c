@@ -8,7 +8,7 @@ static bool _is_dragging = false;
  * The function moves the camera position and ensures that the camera is inside
  * the board.
  */
-static void _camera_move(Camera *camera,
+static void _camera_move(SDL_FRect *camera,
                          const float board_w, const float board_h,
                          const float rel_x, const float rel_y)
 {
@@ -41,14 +41,21 @@ static SDL_AppResult _init(GameState *gs)
     gs->camera.x = 0;
     gs->camera.y = 0;
 
+    int w, h;
     //
     // Get the size of the screen for the camera
     //
-    if (!SDL_GetRenderOutputSize(gs->renderer, &gs->camera.w, &gs->camera.h))
+    if (!SDL_GetRenderOutputSize(gs->renderer, &w, &h))
     {
         SDL_Log("SDL_GetRenderOutputSize: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
+
+    //
+    // Convert int to float
+    //
+    gs->camera.w = w;
+    gs->camera.h = h;
 
     return SDL_APP_CONTINUE;
 }
