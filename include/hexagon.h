@@ -5,9 +5,7 @@
 
 #include "game_state.h"
 
-SDL_FPoint hex_center(const GameState *gs, const SDL_Point hex);
-
-SDL_FPoint hex_corner(const GameState *gs, const SDL_FPoint hex_center, const int corner_i);
+SDL_FPoint hex_corner(const GameState *gs, const SDL_FPoint *center, const int corner_i);
 
 SDL_Point hex_neighbor(const SDL_Point hex, const int i);
 

@@ -38,6 +38,7 @@ static SDL_AppResult _fields_render(GameState *gs)
         }
     }
 
+    SDL_FPoint center;
     //
     // We process the hexagons of all fields.
     //
@@ -50,7 +51,7 @@ static SDL_AppResult _fields_render(GameState *gs)
             //
             // The center of the hexagon is the same for all 6 edges.
             //
-            const SDL_FPoint center = hex_center(gs, field->hex);
+            field_Center(gs, &field->hex, &center);
 
             for (int i = 0; i < 6; i++)
             {
@@ -64,8 +65,8 @@ static SDL_AppResult _fields_render(GameState *gs)
                 //
                 if (!is_valid || !initialized[neighbor.x][neighbor.y])
                 {
-                    const SDL_FPoint start = hex_corner(gs, center, i);
-                    const SDL_FPoint end = hex_corner(gs, center, i + 1);
+                    const SDL_FPoint start = hex_corner(gs, &center, i);
+                    const SDL_FPoint end = hex_corner(gs, &center, i + 1);
 
                     if (!SDL_RenderLine(gs->renderer, start.x, start.y, end.x, end.y))
                     {
