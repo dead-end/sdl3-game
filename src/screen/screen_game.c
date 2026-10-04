@@ -55,7 +55,7 @@ static SDL_AppResult _init(SDL_Renderer *renderer)
     _state->drawables[1] = Background_Create();
     _state->drawables[2] = Stars_Create();
     _state->drawables[3] = Hexagons_Create();
-    _state->drawables[4] = Ship_Create();
+    _state->drawables[4] = Spaceship_Create();
 
     //
     // Delegate the init call
@@ -96,6 +96,7 @@ static SDL_AppResult _event(SDL_Event *event)
 
         case SDLK_SPACE:
             sm_change_screen(SCREEN_START);
+            return SDL_APP_CONTINUE;
             break;
         }
         break;
@@ -189,7 +190,6 @@ static void _cleanup()
     // The fields are allocated separately
     //
     field_cleanup(&_state->gs);
-
     SDL_free(_state);
     _state = NULL;
 }
