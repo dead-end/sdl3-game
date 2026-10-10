@@ -29,6 +29,7 @@ SRC_FILES = src/main.c \
             src/game/game_state.c \
             src/game/field.c \
             src/hexagon/hex_from_pixel.c \
+            src/screen/button.c \
 
 # ------------------------------------------------------------------------------
 # WebAssembly & SDL3 Linker-Flags
