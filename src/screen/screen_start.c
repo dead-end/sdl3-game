@@ -2,22 +2,48 @@
 
 #include "screen_manager.h"
 #include "screen.h"
+#include "button.h"
+
+//
+// The size of the buttons
+//
+#define BTN_W 10 * 8 + 40
+#define BTN_H 8 + 20
 
 typedef struct State
 {
     SDL_Renderer *renderer;
-    int r;
-    int direction;
 
+    Button btn_start;
+    Button btn_quit;
 } State;
 
 static State *_state = NULL;
+
+/**
+ * The callback function for the start button.
+ */
+static SDL_AppResult _callback_start()
+{
+    sm_change_screen(SCREEN_GAME);
+    return SDL_APP_CONTINUE;
+}
+
+/**
+ * The callback function for the quit button.
+ */
+static SDL_AppResult _callback_quit()
+{
+    return SDL_APP_SUCCESS;
+}
 
 /**
  * The init function for the screen.
  */
 static SDL_AppResult _init(SDL_Renderer *renderer)
 {
+    SDL_AppResult result;
+
     SDL_Log("StartScreen: init");
 
     _state = SDL_calloc(1, sizeof(State));
@@ -28,8 +54,31 @@ static SDL_AppResult _init(SDL_Renderer *renderer)
     }
 
     _state->renderer = renderer;
-    _state->r = 100;
-    _state->direction = 1;
+
+    //
+    // Initialize the button functions
+    //
+    result = btn_init(renderer, BTN_W, BTN_H);
+    if (result != SDL_APP_CONTINUE)
+    {
+        return result;
+    }
+
+    //
+    // Set the buttons
+    //
+    result = btn_set(&_state->btn_start, "Start", _callback_start, 100, 10, BTN_W, BTN_H);
+    if (result != SDL_APP_CONTINUE)
+    {
+        return result;
+    }
+
+    result = btn_set(&_state->btn_quit, "Quit", _callback_quit, 100, 100, BTN_W, BTN_H);
+    if (result != SDL_APP_CONTINUE)
+    {
+        return result;
+    }
+
     return SDL_APP_CONTINUE;
 }
 
@@ -40,80 +89,64 @@ static SDL_AppResult _event(SDL_Event *event)
 {
     SDL_Log("StartScreen: event");
 
-    if (event->type == SDL_EVENT_KEY_DOWN)
+    switch (event->type)
     {
+    case SDL_EVENT_KEY_DOWN:
+
         switch (event->key.key)
         {
         case SDLK_ESCAPE:
+            SDL_Log("ESC");
             return SDL_APP_SUCCESS;
             break;
         case SDLK_SPACE:
+            SDL_Log("START");
             sm_change_screen(SCREEN_GAME);
             break;
 
         default:
             break;
         }
+        break;
     }
+
+    //
+    // Delegate the event to the buttons.
+    //
+    SDL_AppResult result;
+
+    result = btn_event(event, &_state->btn_start);
+    if (result != SDL_APP_CONTINUE)
+    {
+        return result;
+    }
+
+    result = btn_event(event, &_state->btn_quit);
+    if (result != SDL_APP_CONTINUE)
+    {
+        return result;
+    }
+
     return SDL_APP_CONTINUE;
 }
 
 /**
- * The update function for the screen.
- */
-static SDL_AppResult _update(double delta_time)
-{
-
-    _state->r += _state->direction * delta_time * 100;
-
-    if (_state->r > 255)
-    {
-        _state->r = 255;
-        _state->direction = -1;
-    }
-
-    if (_state->r < 0)
-    {
-        _state->r = 0;
-        _state->direction = 1;
-    }
-
-    return SDL_APP_CONTINUE;
-}
-
-/**
- * The render function for the screen.
+ * The render function delegates to the buttons.
  */
 static SDL_AppResult _render()
 {
-    if (!SDL_SetRenderDrawColor(_state->renderer, _state->r, 0, 0, 255))
+    SDL_AppResult result;
+
+    result = btn_render(_state->renderer, &_state->btn_start);
+    if (result != SDL_APP_CONTINUE)
     {
-        SDL_Log("SDL_SetRenderDrawColor: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
+        return result;
     }
 
-    SDL_FRect my_rect = {
-        .x = 0.0f,
-        .y = 0.0f,
-        .w = 100.0f,
-        .h = 100.0f};
-
-    if (!SDL_RenderFillRect(_state->renderer, &my_rect))
+    result = btn_render(_state->renderer, &_state->btn_quit);
+    if (result != SDL_APP_CONTINUE)
     {
-        SDL_Log("SDL_RenderFillRect: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
-
-    if (!SDL_SetRenderDrawColor(_state->renderer, 200, 200, 200, 255))
-    {
-        SDL_Log("SDL_SetRenderDrawColor: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
-
-    if (!SDL_RenderDebugText(_state->renderer, 10.0, 10.0, "Press space to continue ..."))
-    {
-        SDL_Log("SDL_RenderDebugText: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
+        return result;
     }
 
     return SDL_APP_CONTINUE;
@@ -126,13 +159,13 @@ static void _cleanup()
 {
     SDL_Log("StartScreen: cleanup");
 
-    if (!_state)
-    {
-        return;
-    }
+    btn_cleanup();
 
-    SDL_free(_state);
-    _state = NULL;
+    if (_state)
+    {
+        SDL_free(_state);
+        _state = NULL;
+    }
 }
 
 /**
@@ -146,7 +179,7 @@ Screen ScreenStart_Create(void)
     Screen s = {0};
     s.init = _init;
     s.event = _event;
-    s.update = _update;
+    s.update = NULL;
     s.render = _render;
     s.cleanup = _cleanup;
     return s;
