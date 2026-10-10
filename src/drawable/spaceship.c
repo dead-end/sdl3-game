@@ -40,8 +40,8 @@ static SDL_AppResult _init(GameState *gs)
 
     SDL_DestroySurface(surface);
 
-    _starship.hex.x = 1;
-    _starship.hex.y = 1;
+    _starship.hex.x = 5;
+    _starship.hex.y = 5;
 
     _starship.current_frame = 0;
     _starship.num_frames = 4;
