@@ -87,6 +87,16 @@ static SDL_AppResult _fields_render(GameState *gs)
  */
 static SDL_AppResult _init(GameState *gs)
 {
+
+    //
+    // TODO: ??
+    //
+    if (!SDL_SetRenderDrawBlendMode(gs->renderer, SDL_BLENDMODE_NONE))
+    {
+        SDL_Log("SDL_SetRenderDrawBlendMode: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
+
     //
     // Create the texture
     //
