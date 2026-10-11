@@ -100,6 +100,8 @@ static SDL_Point _axial_round(SDL_FPoint fAxial)
  *
  * See: https://www.redblobgames.com/grids/hexagons/
  */
+// TODO: function name
+// TODO: Pointer mouseRel
 SDL_Point hex_from_pixel(const GameState *gs, const SDL_FPoint mouseRel)
 {
     //
