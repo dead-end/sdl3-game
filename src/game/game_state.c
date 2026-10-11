@@ -71,13 +71,13 @@ SDL_AppResult gs_init(GameState *gs, SDL_Renderer *renderer)
 }
 
 /**
- * not used
+ * The function compute the position on the camera for the absolute position.
+ * The result may not on the camera.
  */
-SDL_FPoint gs_board_to_camera(float board_x, float board_y, float camera_x, float camera_y)
+void gs_abs_to_camera(GameState *gs, SDL_FPoint *p)
 {
-    return (SDL_FPoint){
-        .x = board_x - camera_x,
-        .y = board_y - camera_y};
+    p->x -= gs->camera.x;
+    p->y -= gs->camera.y;
 }
 
 /**
