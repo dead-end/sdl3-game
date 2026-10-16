@@ -117,14 +117,14 @@ void field_FRectOnField(const GameState *gs, const SDL_Point *field, const SDL_F
     //
     // move the top left corner of the origin field to the current field.
     //
-    SDL_FPoint origin;
-    field_top_left(gs, field, &origin);
+    SDL_FPoint top_left;
+    field_top_left(gs, field, &top_left);
 
     //
     // Place the rect over the field.
     //
-    dst->x = origin.x;
-    dst->y = origin.y;
+    dst->x = top_left.x;
+    dst->y = top_left.y;
     dst->w = src->w;
     dst->h = src->h;
 }
