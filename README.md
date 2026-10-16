@@ -35,3 +35,11 @@ C/C++: Configuration edit (JSON)
 add to includePath
 
 "${userHome}/Desktop/emsdk/upstream/emscripten/cache/sysroot/include"
+
+## Build
+
+```sh
+source $HOME/Desktop/emsdk/emsdk_env.sh
+
+make clean && make BUILD_TYPE=Debug && make run
+```
