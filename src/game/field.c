@@ -93,10 +93,20 @@ bool field_FRectToCamera(const GameState *gs, SDL_FRect *rect)
  * The function computes the center of a hexagon on the board, based on the
  * coordinates of the origin on the canvas.
  */
-void field_Center(const GameState *gs, const SDL_Point *field, SDL_FPoint *center)
+void field_center(const GameState *gs, const SDL_Point *field, SDL_FPoint *center)
 {
     center->x = gs->field_origin.x + field->x * gs->hSpace;
-    center->y = gs->field_origin.y + field->y * gs->vSpace + ((field->x % 2) * gs->vSpace) / 2;
+    center->y = gs->field_origin.y + field->y * gs->vSpace + ((field->x % 2) * gs->vSpace) / 2.0f;
+};
+
+/**
+ * The function compute the position of the top left corner (0,0) of the origin
+ * field to the top left corner on the current field.
+ */
+void field_top_left(const GameState *gs, const SDL_Point *field, SDL_FPoint *top_left)
+{
+    top_left->x = field->x * gs->hSpace;
+    top_left->y = field->y * gs->vSpace + ((field->x % 2) * gs->vSpace) / 2.0f;
 };
 
 /**
@@ -105,16 +115,16 @@ void field_Center(const GameState *gs, const SDL_Point *field, SDL_FPoint *cente
 void field_FRectOnField(const GameState *gs, const SDL_Point *field, const SDL_FRect *src, SDL_FRect *dst)
 {
     //
-    // Get the absolute coordinates of the center of the field.
+    // move the top left corner of the origin field to the current field.
     //
-    SDL_FPoint center;
-    field_Center(gs, field, &center);
+    SDL_FPoint origin;
+    field_top_left(gs, field, &origin);
 
     //
     // Place the rect over the field.
     //
-    dst->x = center.x - src->w / 2;
-    dst->y = center.y - src->h / 2;
+    dst->x = origin.x;
+    dst->y = origin.y;
     dst->w = src->w;
     dst->h = src->h;
 }
