@@ -52,7 +52,7 @@ static SDL_AppResult _fields_render(GameState *gs)
             //
             // The center of the hexagon is the same for all 6 edges.
             //
-            field_Center(gs, &field->hex, &center);
+            field_center(gs, &field->hex, &center);
 
             for (int i = 0; i < 6; i++)
             {
