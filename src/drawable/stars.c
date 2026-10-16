@@ -127,8 +127,8 @@ static SDL_AppResult _update(GameState *gs, double delta_time)
 
     for (int i = 0; i < _stars_num; i++)
     {
-        new_star_pos.x = _stars[i].x + delta.x * _stars[i].size / (MAX_SIZE + 1) * _stars[i].speed;
-        new_star_pos.y = _stars[i].y + delta.y * _stars[i].size / (MAX_SIZE + 1) * _stars[i].speed;
+        new_star_pos.x = _stars[i].x + delta.x * _stars[i].size / (MAX_SIZE + 1.0f) * _stars[i].speed;
+        new_star_pos.y = _stars[i].y + delta.y * _stars[i].size / (MAX_SIZE + 1.0f) * _stars[i].speed;
 
         new_star_pos.x = SDL_fmodf(new_star_pos.x, gs->camera.w);
         if (new_star_pos.x < 0.0f)

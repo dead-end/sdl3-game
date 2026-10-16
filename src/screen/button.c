@@ -148,8 +148,8 @@ SDL_AppResult btn_set(Button *btn, const char *text, SDL_AppResult (*callback)()
 
     btn->text = text;
 
-    btn->txt_pos.x = x + (w - SDL_strlen(text) * CHAR_W) / 2;
-    btn->txt_pos.y = y + (h - CHAR_H) / 2;
+    btn->txt_pos.x = x + ((float)(w - SDL_strlen(text) * CHAR_W)) / 2.0f;
+    btn->txt_pos.y = y + ((float)(h - CHAR_H)) / 2.0f;
 
     btn->mouse = false;
 

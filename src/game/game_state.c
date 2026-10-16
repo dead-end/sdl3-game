@@ -52,14 +52,14 @@ SDL_AppResult gs_init(GameState *gs, SDL_Renderer *renderer)
     // The origin of the field on the screen, which is the center of the top
     // left hexagon.
     //
-    gs->field_origin.x = gs->width / 2;
-    gs->field_origin.y = gs->height / 2;
+    gs->field_origin.x = gs->width / 2.0f;
+    gs->field_origin.y = gs->height / 2.0f;
 
     //
     // Compute board sizes
     //
     const float x = 2 * gs->size + (gs->fields_num.x - 1) * gs->hSpace;
-    const float y = gs->fields_num.y * gs->vSpace + gs->vSpace / 2;
+    const float y = gs->fields_num.y * gs->vSpace + gs->vSpace / 2.0f;
 
     //
     // board size
