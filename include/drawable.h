@@ -28,4 +28,6 @@ Drawable Hexagons_Create();
 
 Drawable Spaceship_Create();
 
+Drawable Highlight_Create();
+
 #endif

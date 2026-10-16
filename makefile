@@ -26,6 +26,7 @@ SRC_FILES = src/main.c \
             src/drawable/stars.c \
             src/drawable/hexagons.c \
             src/drawable/spaceship.c \
+            src/drawable/highlight.c \
             src/game/game_state.c \
             src/game/field.c \
             src/hexagon/hex_from_pixel.c \

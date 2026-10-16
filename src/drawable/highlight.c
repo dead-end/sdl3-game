@@ -5,23 +5,29 @@
 #include "field.h"
 #include "hexagon.h"
 
-const SDL_FColor _color = {0.0f, 1.0f, 0.0f, 0.2f};
-
+//
+// The highlighted field. The event function sets the values and the render
+// function uses it.
+//
 static SDL_Point _current = {.x = -1, .y = -1};
 
 static SDL_Texture *_texture = NULL;
 
+/**
+ * The function draws a highlighted hexagon on a texture.
+ */
 SDL_AppResult _draw_hexagon(GameState *gs,
                             SDL_FPoint *center)
 {
+    const SDL_FColor color = {0.0f, 1.0f, 0.0f, 0.2f};
+
     SDL_Vertex vertices[7];
 
     //
     // Center
     //
     vertices[0].position = *center;
-    // gs_abs_to_camera(gs, &vertices[0].position);
-    vertices[0].color = _color;
+    vertices[0].color = color;
 
     //
     // 6 corners
@@ -29,13 +35,13 @@ SDL_AppResult _draw_hexagon(GameState *gs,
     for (int i = 0; i < 6; i++)
     {
         hex_corner(gs, center, i, &vertices[i + 1].position);
-        //  gs_abs_to_camera(gs, &vertices[i + 1].position);
-        vertices[i + 1].color = _color;
+        vertices[i + 1].color = color;
     }
 
     //
     // 6 triangles, 2 corners and the center
-    // Note: Vertices must be connected in a consistent clockwise or counter-clockwise order.
+    // Note: Vertices must be connected in a consistent clockwise or
+    // counter-clockwise order.
     //
     const int indices[18] = {
         0, 1, 2,
@@ -57,6 +63,9 @@ SDL_AppResult _draw_hexagon(GameState *gs,
     return SDL_APP_CONTINUE;
 }
 
+/**
+ * Create an initialize the texture.
+ */
 static SDL_AppResult _init(GameState *gs)
 {
     //
@@ -66,6 +75,10 @@ static SDL_AppResult _init(GameState *gs)
         gs->renderer,
         SDL_PIXELFORMAT_RGBA8888,
         SDL_TEXTUREACCESS_TARGET,
+        //
+        // we make the width / hight a little bit larger to ensure that nothing
+        // is cut off.
+        //
         SDL_ceilf(gs->width),
         SDL_ceilf(gs->height));
     if (_texture == NULL)
@@ -73,8 +86,6 @@ static SDL_AppResult _init(GameState *gs)
         SDL_Log("SDL_CreateTexture: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
-
-    SDL_Log("w: %f %f h: %f %f", gs->width, SDL_ceilf(gs->width), gs->height, SDL_ceilf(gs->height));
 
     //
     // Replace the renderer with the texture
@@ -85,6 +96,9 @@ static SDL_AppResult _init(GameState *gs)
         return SDL_APP_FAILURE;
     }
 
+    //
+    // Draw the hexagon on the texture
+    //
     SDL_AppResult result = _draw_hexagon(gs, &gs->field_origin);
     if (result != SDL_APP_CONTINUE)
     {
@@ -103,6 +117,9 @@ static SDL_AppResult _init(GameState *gs)
     return SDL_APP_CONTINUE;
 }
 
+/**
+ * The function cleanups the texture.
+ */
 static void _cleanup()
 {
     if (_texture != NULL)
@@ -135,61 +152,40 @@ static SDL_AppResult _event(GameState *gs, SDL_Event *event)
     return SDL_APP_CONTINUE;
 }
 
-/*
-static SDL_AppResult _update(GameState *gs, double delta_time)
-{
-    (void)gs;
-    return SDL_APP_CONTINUE;
-}
-*/
-
+/**
+ * The function renders the texture.
+ */
 static SDL_AppResult _render(GameState *gs)
 {
-    /*
+    //
+    // Check if we have a highlighted field.
+    //
     if (_current.x >= 0 && _current.y >= 0)
     {
-        SDL_FPoint center;
+        //
+        // Get the top left corner of the field and get its position on the
+        // camera.
+        //
+        SDL_FPoint top_left;
+        field_top_left(gs, &_current, &top_left);
+        gs_abs_to_camera(gs, &top_left);
 
-        field_Center(gs, &_current, &center);
+        SDL_FRect dst = {
+            .x = top_left.x,
+            .y = top_left.y,
+            .w = _texture->w,
+            .h = _texture->h};
 
-        SDL_AppResult result = _draw_hexagon(gs, &center);
-        if (result != SDL_APP_CONTINUE)
+        //
+        // Ensure that the texture is visible
+        //
+        if (!SDL_HasRectIntersectionFloat(&dst, &gs->camera))
         {
-            SDL_Log("SDL_RenderDebugText: %s", SDL_GetError());
-            return SDL_APP_FAILURE;
+            return SDL_APP_CONTINUE;
         }
-    }
-*/
-    if (_current.x >= 0 && _current.y >= 0)
-    {
-        /*
-        SDL_FPoint center;
-
-        field_Center(gs, &_current, &center);
-
-        gs_abs_to_camera(gs, &center);
-
-        SDL_FRect dst = {
-            .x = center.x - gs->field_origin.x,
-            .y = center.y - gs->field_origin.y,
-            .w = _texture->w,
-            .h = _texture->h};
-*/
-
-        SDL_FPoint corner;
-
-        field_Corner(gs, &_current, &corner);
-
-        gs_abs_to_camera(gs, &corner);
-
-        SDL_FRect dst = {
-            .x = corner.x,
-            .y = corner.y,
-            .w = _texture->w,
-            .h = _texture->h};
 
         //
-        //
+        // Render the texture at the computed position.
         //
         if (!SDL_RenderTexture(gs->renderer, _texture, NULL, &dst))
         {
@@ -201,6 +197,9 @@ static SDL_AppResult _render(GameState *gs)
     return SDL_APP_CONTINUE;
 }
 
+/**
+ * The function creates the Drawable.
+ */
 Drawable Highlight_Create()
 {
     SDL_Log("Ship: create");
