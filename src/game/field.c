@@ -110,21 +110,21 @@ void field_top_left(const GameState *gs, const SDL_Point *field, SDL_FPoint *top
 };
 
 /**
- * The function sets the rect coordinates for a rect on a field.
+ *
  */
 void field_FRectOnField(const GameState *gs, const SDL_Point *field, const SDL_FRect *src, SDL_FRect *dst)
 {
     //
-    // move the top left corner of the origin field to the current field.
+    // Get the center of the field
     //
-    SDL_FPoint top_left;
-    field_top_left(gs, field, &top_left);
+    SDL_FPoint center;
+    field_center(gs, field, &center);
 
     //
-    // Place the rect over the field.
+    // Place the rect over the center.
     //
-    dst->x = top_left.x;
-    dst->y = top_left.y;
+    dst->x = center.x - (src->w * 0.5);
+    dst->y = center.y - (src->h * 0.5);
     dst->w = src->w;
     dst->h = src->h;
 }
