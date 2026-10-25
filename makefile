@@ -16,6 +16,7 @@ BUILD_TYPE ?= Release
 # Source files
 SRC_FILES = src/main.c \
 			src/misc/log.c \
+            src/misc/button.c \
             src/hexagon/hex_corners.c \
             src/field/field.c \
             src/field/field_neighbor.c \
@@ -30,7 +31,6 @@ SRC_FILES = src/main.c \
             src/drawable/highlight.c \
             src/game/game_state.c \
             src/hexagon/hex_from_pixel.c \
-            src/screen/button.c \
             src/sprite/sprite.c \
 
 # ------------------------------------------------------------------------------
