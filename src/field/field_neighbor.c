@@ -26,14 +26,16 @@ static const SDL_Point _NEIGHBOR_ODD[] = {
  * The function returns the coordinates of neighbor of a hexagon in a given
  * direction.
  */
-SDL_Point hex_neighbor(const SDL_Point hex, const int i)
+void field_neighbor(const SDL_Point hex, const int i, SDL_Point *neighbor)
 {
     const SDL_Point *neighbors = hex.x % 2 == 0 ? _NEIGHBOR_EVEN : _NEIGHBOR_ODD;
 
-    const int idx = i % 6;
+    int idx = i % 6;
+    if (idx < 0)
+    {
+        idx += 6;
+    }
 
-    return (SDL_Point){
-        .x = hex.x + neighbors[idx].x,
-        .y = hex.y + neighbors[idx].y,
-    };
+    neighbor->x = hex.x + neighbors[idx].x;
+    neighbor->y = hex.y + neighbors[idx].y;
 };

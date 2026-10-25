@@ -13,6 +13,8 @@ bool field_is_valid(const GameState *gs, const SDL_Point hex);
 
 void field_center(const GameState *gs, const SDL_Point *field, SDL_FPoint *center);
 
+void field_neighbor(const SDL_Point hex, const int i, SDL_Point *neighbor);
+
 void field_top_left(const GameState *gs, const SDL_Point *field, SDL_FPoint *top_left);
 
 bool field_FRectToCamera(const GameState *gs, SDL_FRect *absRect);
