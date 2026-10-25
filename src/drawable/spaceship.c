@@ -11,19 +11,8 @@ typedef enum EDirection
     E_DIR_RIGHT = 1
 } EDirection;
 
-typedef struct Movement
-{
-    SDL_Point *field;
-    int *direction;
-
-    bool moving;
-} Movement;
-
 typedef struct Rotate
 {
-    double angleCur;
-
-    int target_dir;
     int direction;
     float speed;
     bool rotating;
@@ -88,21 +77,17 @@ bool move_update(Move *move, const double delta_time)
     return true;
 }
 
-void rotate_init(Rotate *rotate, const int start, const int end)
+void rotate_init(Rotate *rotate, const int target_direction, const float speed)
 {
-    rotate->angleCur = start * 60.0f;
-    // rotate->angleEnd = end % 6 * 60.0f;
+    rotate->speed = speed;
 
-    rotate->target_dir = end % 6;
-    if (rotate->target_dir < 0)
+    rotate->direction = target_direction % 6;
+    if (rotate->direction < 0)
     {
-        rotate->target_dir += 6;
+        rotate->direction += 6;
     }
 
-    rotate->speed = 60.0;
     rotate->rotating = true;
-
-    rotate->direction = end;
 }
 
 /**
@@ -168,10 +153,12 @@ bool rotate_update(double *current_angle, int target_direction, float speed, dou
 
 typedef struct Starship
 {
-    SDL_Point hex;
+    SDL_Point field;
     int direction;
 
     Sprite sprite;
+
+    double angle;
 } Starship;
 
 static Starship _starship;
@@ -181,8 +168,11 @@ static Starship _starship;
  */
 static SDL_AppResult _init(GameState *gs)
 {
-    _starship.hex.x = 5;
-    _starship.hex.y = 5;
+    _starship.field.x = 5;
+    _starship.field.y = 5;
+
+    _starship.direction = 0;
+    _starship.angle = 0.0;
 
     const SDL_AppResult result = sprite_init(gs, &_starship.sprite, "assets/spaceship.png", 4, 0.15);
     if (result != SDL_APP_CONTINUE)
@@ -225,14 +215,14 @@ static SDL_AppResult _event(GameState *gs, SDL_Event *event)
         case SDLK_L:
             if (!_rotate.rotating)
             {
-                rotate_init(&_rotate, _starship.direction, _starship.direction - 1);
+                rotate_init(&_rotate, _starship.direction + E_DIR_LEFT, 60.0);
             }
             break;
 
         case SDLK_R:
             if (!_rotate.rotating)
             {
-                rotate_init(&_rotate, _starship.direction, _starship.direction + 1);
+                rotate_init(&_rotate, _starship.direction + E_DIR_RIGHT, 60.0);
             }
             break;
 
@@ -240,8 +230,8 @@ static SDL_AppResult _event(GameState *gs, SDL_Event *event)
             if (!_move.moving)
             {
                 SDL_Point end;
-                field_neighbor(_starship.hex, _starship.direction, &end);
-                move_init(gs, &_move, &_starship.hex, &end, 40, 40);
+                field_neighbor(_starship.field, _starship.direction, &end);
+                move_init(gs, &_move, &_starship.field, &end, 40, 40);
             }
             break;
         }
@@ -261,11 +251,12 @@ static SDL_AppResult _update(GameState *gs, double delta_time)
     if (_rotate.rotating)
     {
         SDL_Log("rote");
-        _rotate.rotating = rotate_update(&_rotate.angleCur, _rotate.target_dir, _rotate.speed, delta_time);
+        _rotate.rotating = rotate_update(&_starship.angle, _rotate.direction, _rotate.speed, delta_time);
 
         if (!_rotate.rotating)
         {
             _starship.direction = _rotate.direction;
+            _starship.angle = _starship.direction * 60.0;
         }
     }
 
@@ -275,8 +266,8 @@ static SDL_AppResult _update(GameState *gs, double delta_time)
         _move.moving = move_update(&_move, delta_time);
         if (!_move.moving)
         {
-            _starship.hex.x = _move.field.x;
-            _starship.hex.y = _move.field.y;
+            _starship.field.x = _move.field.x;
+            _starship.field.y = _move.field.y;
         }
     }
 
@@ -296,7 +287,7 @@ static SDL_AppResult _render(GameState *gs)
     }
     else
     {
-        field_FRectOnField(gs, &_starship.hex, &_starship.sprite.src, &dstRect);
+        field_FRectOnField(gs, &_starship.field, &_starship.sprite.src, &dstRect);
     }
 
     if (!field_FRectToCamera(gs, &dstRect))
@@ -304,17 +295,7 @@ static SDL_AppResult _render(GameState *gs)
         return SDL_APP_CONTINUE;
     }
 
-    double angle;
-    if (_rotate.rotating)
-    {
-        angle = _rotate.angleCur;
-    }
-    else
-    {
-        angle = 60.0 * _starship.direction;
-    }
-
-    if (!SDL_RenderTextureRotated(gs->renderer, _starship.sprite.sheet, &_starship.sprite.src, &dstRect, angle, NULL, SDL_FLIP_NONE))
+    if (!SDL_RenderTextureRotated(gs->renderer, _starship.sprite.sheet, &_starship.sprite.src, &dstRect, _starship.angle, NULL, SDL_FLIP_NONE))
     {
         SDL_Log("SDL_RenderTextureRotated: %s", SDL_GetError());
         return SDL_APP_FAILURE;
