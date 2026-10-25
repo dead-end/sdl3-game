@@ -57,7 +57,8 @@ static SDL_AppResult _fields_render(GameState *gs)
             for (int i = 0; i < 6; i++)
             {
 
-                const SDL_Point neighbor = hex_neighbor(field->hex, i);
+                SDL_Point neighbor;
+                field_neighbor(field->hex, i, &neighbor);
                 const bool is_valid = field_is_valid(gs, neighbor);
 
                 //
