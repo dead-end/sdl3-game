@@ -17,7 +17,7 @@ BUILD_TYPE ?= Release
 SRC_FILES = src/main.c \
 			src/misc/log.c \
             src/hexagon/hex_corners.c \
-            src/hexagon/hex_neighbor.c \
+            src/field/field_neighbor.c \
             src/screen/screen_manager.c \
             src/screen/screen_start.c \
 			src/screen/screen_game.c \
