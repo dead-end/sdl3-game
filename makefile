@@ -17,6 +17,7 @@ BUILD_TYPE ?= Release
 SRC_FILES = src/main.c \
 			src/misc/log.c \
             src/hexagon/hex_corners.c \
+            src/field/field.c \
             src/field/field_neighbor.c \
             src/screen/screen_manager.c \
             src/screen/screen_start.c \
@@ -28,7 +29,6 @@ SRC_FILES = src/main.c \
             src/drawable/spaceship.c \
             src/drawable/highlight.c \
             src/game/game_state.c \
-            src/game/field.c \
             src/hexagon/hex_from_pixel.c \
             src/screen/button.c \
 
