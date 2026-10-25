@@ -31,6 +31,7 @@ SRC_FILES = src/main.c \
             src/game/game_state.c \
             src/hexagon/hex_from_pixel.c \
             src/screen/button.c \
+            src/sprite/sprite.c \
 
 # ------------------------------------------------------------------------------
 # WebAssembly & SDL3 Linker-Flags
