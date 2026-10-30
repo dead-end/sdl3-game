@@ -72,20 +72,22 @@ bool field_is_valid(const GameState *gs, const SDL_Point hex)
 }
 
 /**
- * The function computes the camera coordinates from the absolute coordinates.
+ * The function is called with the absolute position of a rect and it computes
+ * the relative position inside the camera view.
  */
-bool field_FRectToCamera(const GameState *gs, SDL_FRect *rect)
+bool field_abs_to_camera(const GameState *gs, const SDL_FRect *abs, SDL_FRect *rel)
 {
     //
     // If the rect is not on the camera rect, there is nothing to do.
     //
-    if (!SDL_HasRectIntersectionFloat(rect, &gs->camera))
+    if (!SDL_HasRectIntersectionFloat(rel, &gs->camera))
     {
         return false;
     }
-    rect->x -= gs->camera.x;
-    rect->y -= gs->camera.y;
-
+    rel->x = abs->x - gs->camera.x;
+    rel->y = abs->y - gs->camera.y;
+    rel->w = abs->w;
+    rel->h = abs->h;
     return true;
 }
 
@@ -109,10 +111,11 @@ void field_top_left(const GameState *gs, const SDL_Point *field, SDL_FPoint *top
     top_left->y = field->y * gs->vSpace + ((field->x % 2) * gs->vSpace) / 2.0f;
 };
 
+// TODO: It is not clear what is the best way to deal with the width and height.
 /**
- *
+ * The function places a rect on a field.
  */
-void field_FRectOnField(const GameState *gs, const SDL_Point *field, const SDL_FRect *src, SDL_FRect *dst)
+void field_place_frect(const GameState *gs, const SDL_Point *field, SDL_FRect *rect)
 {
     //
     // Get the center of the field
@@ -123,8 +126,25 @@ void field_FRectOnField(const GameState *gs, const SDL_Point *field, const SDL_F
     //
     // Place the rect over the center.
     //
-    dst->x = center.x - (src->w * 0.5);
-    dst->y = center.y - (src->h * 0.5);
-    dst->w = src->w;
-    dst->h = src->h;
+    rect->x = center.x - (rect->w * 0.5);
+    rect->y = center.y - (rect->h * 0.5);
+}
+
+/**
+ * The function computes the corner of a rectangle, places on a field with a
+ * given width and height.
+ */
+void field_rect_corner(const GameState *gs, const SDL_Point *field, const int w, const int h, SDL_FPoint *corner)
+{
+    //
+    // Get the center of the field
+    //
+    SDL_FPoint center;
+    field_center(gs, field, &center);
+
+    //
+    // Compute the corner of the rect over the center.
+    //
+    corner->x = center.x - (w * 0.5);
+    corner->y = center.y - (h * 0.5);
 }
