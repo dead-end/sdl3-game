@@ -1,9 +1,9 @@
 #include <SDL3/SDL.h>
 
 #include "drawable.h"
-#include "hexagon.h"
 #include "field.h"
 #include "sprite.h"
+#include "move.h"
 
 typedef enum EDirection
 {
@@ -22,59 +22,34 @@ static Rotate _rotate = {0};
 
 typedef struct Move
 {
-    SDL_FRect cur;
-    SDL_FRect end;
-    SDL_FPoint dir;
+    SDL_FPoint target;
+    SDL_FPoint direction;
     float speed;
     bool moving;
-    SDL_Point field;
+    SDL_Point neighbor;
 } Move;
 
 static Move _move = {0};
 
-void move_init(const GameState *gs, Move *move, const SDL_Point *start, const SDL_Point *end, const int w, const int h)
+void move_init(const GameState *gs, Move *move, const SDL_Point *start, const SDL_Point *neighbor, const SDL_FRect *abs)
 {
+    SDL_Log("move init start: %d, %d neighbor: %d, %d", start->x, start->y, neighbor->x, neighbor->y);
 
-    SDL_Log("move init start: %d, %d end: %d, %d", start->x, start->y, end->x, end->y);
+    field_rect_corner(gs, neighbor, abs->w, abs->h, &move->target);
 
-    SDL_FRect srcRect;
-    srcRect.x = 0;
-    srcRect.y = 0;
-    srcRect.w = w;
-    srcRect.h = h;
-
-    field_FRectOnField(gs, start, &srcRect, &move->cur);
-    field_FRectOnField(gs, end, &srcRect, &move->end);
-
-    move->dir.x = move->cur.x - move->end.x;
-    move->dir.y = move->cur.y - move->end.y;
+    //
+    // The direction vector works because we move to a neighbor, so the length
+    // is always the same. If we move to an other place, then the speed will be
+    // different.
+    //
+    move->direction.x = abs->x - move->target.x;
+    move->direction.y = abs->y - move->target.y;
 
     move->speed = 1.0f;
     move->moving = true;
 
-    move->field.x = end->x;
-    move->field.y = end->y;
-}
-
-bool move_update(Move *move, const double delta_time)
-{
-    const float dx = move->speed * delta_time * move->dir.x;
-    const float dy = move->speed * delta_time * move->dir.y;
-
-    //    SDL_Log("dx: %f, dy: %f", dx, dy);
-    //    SDL_Log("cur: %f, cur: %f", move->cur.x, move->cur.y);
-    //    SDL_Log("end: %f, end: %f", move->end.x, move->end.y);
-
-    if (SDL_fabsf(move->end.x - move->cur.x) <= SDL_fabsf(dx) &&
-        SDL_fabsf(move->end.y - move->cur.y) <= SDL_fabsf(dy))
-    {
-        move->cur.x = move->end.x;
-        move->cur.y = move->end.y;
-        return false;
-    }
-    move->cur.x -= dx;
-    move->cur.y -= dy;
-    return true;
+    move->neighbor.x = neighbor->x;
+    move->neighbor.y = neighbor->y;
 }
 
 void rotate_init(Rotate *rotate, const int target_direction, const float speed)
@@ -90,67 +65,6 @@ void rotate_init(Rotate *rotate, const int target_direction, const float speed)
     rotate->rotating = true;
 }
 
-/**
- *
- */
-bool rotate_update(double *current_angle, int target_direction, float speed, double delta_time)
-{
-    const double target_angle = target_direction * 60.0;
-
-    //
-    // Compute the difference between the current and the target angle and
-    // normalize it to [-180, 180]
-    //
-    float delta = target_angle - *current_angle;
-    while (delta < -180.0f)
-    {
-        delta += 360.0f;
-    }
-    while (delta > 180.0f)
-    {
-        delta -= 360.0f;
-    }
-
-    float step = speed * delta_time;
-
-    //
-    // If our step is less than the delta we use the target
-    //
-    if (SDL_fabsf(delta) <= step)
-    {
-        *current_angle = target_angle;
-        return false;
-    }
-
-    //
-    // Normal step
-    //
-    if (delta > 0.0f)
-    {
-        *current_angle += step;
-    }
-    else
-    {
-        *current_angle -= step;
-    }
-
-    //
-    // normalize the angle to [0, 360) for SDL
-    //
-    while (*current_angle < 0.0f)
-    {
-        *current_angle += 360.0f;
-    }
-    while (*current_angle >= 360.0f)
-    {
-        *current_angle -= 360.0f;
-    }
-
-    return true;
-}
-
-// ---
-
 typedef struct Starship
 {
     SDL_Point field;
@@ -159,6 +73,7 @@ typedef struct Starship
     Sprite sprite;
 
     double angle;
+    SDL_FRect abs;
 } Starship;
 
 static Starship _starship;
@@ -168,17 +83,22 @@ static Starship _starship;
  */
 static SDL_AppResult _init(GameState *gs)
 {
-    _starship.field.x = 5;
-    _starship.field.y = 5;
-
-    _starship.direction = 0;
-    _starship.angle = 0.0;
 
     const SDL_AppResult result = sprite_init(gs, &_starship.sprite, "assets/spaceship.png", 4, 0.15);
     if (result != SDL_APP_CONTINUE)
     {
         return result;
     }
+
+    _starship.field.x = 5;
+    _starship.field.y = 5;
+
+    _starship.direction = 0;
+    _starship.angle = 0.0;
+
+    _starship.abs.w = _starship.sprite.src.w;
+    _starship.abs.h = _starship.sprite.src.h;
+    field_place_frect(gs, &_starship.field, &_starship.abs);
 
     return SDL_APP_CONTINUE;
 }
@@ -203,7 +123,7 @@ static SDL_AppResult _event(GameState *gs, SDL_Event *event)
                 .x = event->motion.x,
                 .y = event->motion.y};
 
-            SDL_Point p = hex_from_pixel(gs, m);
+            SDL_Point p = field_from_pixel(gs, &m);
 
             SDL_Log("field: %d / %d mouse: %f / %f", p.x, p.y, m.x, m.y);
         }
@@ -229,9 +149,11 @@ static SDL_AppResult _event(GameState *gs, SDL_Event *event)
         case SDLK_F:
             if (!_move.moving)
             {
-                SDL_Point end;
-                field_neighbor(_starship.field, _starship.direction, &end);
-                move_init(gs, &_move, &_starship.field, &end, 40, 40);
+                SDL_Point neighbor;
+                if (field_neighbor(gs, &_starship.field, _starship.direction, &neighbor))
+                {
+                    move_init(gs, &_move, &_starship.field, &neighbor, &_starship.abs);
+                }
             }
             break;
         }
@@ -251,7 +173,7 @@ static SDL_AppResult _update(GameState *gs, double delta_time)
     if (_rotate.rotating)
     {
         SDL_Log("rote");
-        _rotate.rotating = rotate_update(&_starship.angle, _rotate.direction, _rotate.speed, delta_time);
+        _rotate.rotating = move_rotate(&_starship.angle, _rotate.direction, _rotate.speed, delta_time);
 
         if (!_rotate.rotating)
         {
@@ -263,11 +185,11 @@ static SDL_AppResult _update(GameState *gs, double delta_time)
     if (_move.moving)
     {
         SDL_Log("move");
-        _move.moving = move_update(&_move, delta_time);
+        _move.moving = move_direction(&_move.target, &_move.direction, _move.speed, delta_time, &_starship.abs);
         if (!_move.moving)
         {
-            _starship.field.x = _move.field.x;
-            _starship.field.y = _move.field.y;
+            _starship.field.x = _move.neighbor.x;
+            _starship.field.y = _move.neighbor.y;
         }
     }
 
@@ -276,26 +198,13 @@ static SDL_AppResult _update(GameState *gs, double delta_time)
 
 static SDL_AppResult _render(GameState *gs)
 {
-    SDL_FRect dstRect;
-
-    if (_move.moving)
-    {
-        dstRect.x = _move.cur.x;
-        dstRect.y = _move.cur.y;
-        dstRect.w = _move.cur.w;
-        dstRect.h = _move.cur.h;
-    }
-    else
-    {
-        field_FRectOnField(gs, &_starship.field, &_starship.sprite.src, &dstRect);
-    }
-
-    if (!field_FRectToCamera(gs, &dstRect))
+    SDL_FRect camera;
+    if (!field_abs_to_camera(gs, &_starship.abs, &camera))
     {
         return SDL_APP_CONTINUE;
     }
 
-    if (!SDL_RenderTextureRotated(gs->renderer, _starship.sprite.sheet, &_starship.sprite.src, &dstRect, _starship.angle, NULL, SDL_FLIP_NONE))
+    if (!SDL_RenderTextureRotated(gs->renderer, _starship.sprite.sheet, &_starship.sprite.src, &camera, _starship.angle, NULL, SDL_FLIP_NONE))
     {
         SDL_Log("SDL_RenderTextureRotated: %s", SDL_GetError());
         return SDL_APP_FAILURE;
