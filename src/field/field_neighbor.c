@@ -1,5 +1,7 @@
 #include <SDL3/SDL.h>
 
+#include "field.h"
+
 /**
  * We are using a odd-q hex model as described in:
  * https://www.redblobgames.com/grids/hexagons/
@@ -26,7 +28,7 @@ static const SDL_Point _NEIGHBOR_ODD[] = {
  * The function returns the coordinates of neighbor of a hexagon in a given
  * direction.
  */
-void field_neighbor(const SDL_Point hex, const int i, SDL_Point *neighbor)
+bool field_neighbor(const GameState *gs, const SDL_Point hex, const int i, SDL_Point *neighbor)
 {
     const SDL_Point *neighbors = hex.x % 2 == 0 ? _NEIGHBOR_EVEN : _NEIGHBOR_ODD;
 
@@ -38,4 +40,6 @@ void field_neighbor(const SDL_Point hex, const int i, SDL_Point *neighbor)
 
     neighbor->x = hex.x + neighbors[idx].x;
     neighbor->y = hex.y + neighbors[idx].y;
+
+    return field_is_valid(gs, neighbor);
 };

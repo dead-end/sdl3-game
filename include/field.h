@@ -9,11 +9,11 @@ SDL_AppResult field_init(GameState *gs);
 
 void field_cleanup(GameState *gs);
 
-bool field_is_valid(const GameState *gs, const SDL_Point hex);
+bool field_is_valid(const GameState *gs, const SDL_Point *field);
 
 void field_center(const GameState *gs, const SDL_Point *field, SDL_FPoint *center);
 
-void field_neighbor(const SDL_Point hex, const int i, SDL_Point *neighbor);
+bool field_neighbor(const GameState *gs, const SDL_Point hex, const int i, SDL_Point *neighbor);
 
 void field_top_left(const GameState *gs, const SDL_Point *field, SDL_FPoint *top_left);
 

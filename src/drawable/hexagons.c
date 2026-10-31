@@ -58,8 +58,7 @@ static SDL_AppResult _fields_render(GameState *gs)
             {
 
                 SDL_Point neighbor;
-                field_neighbor(field->hex, i, &neighbor);
-                const bool is_valid = field_is_valid(gs, neighbor);
+                const bool is_valid = field_neighbor(gs, field->hex, i, &neighbor);
 
                 //
                 // If the hexagon has no neighbor in this direction or the hexagon in

@@ -141,7 +141,7 @@ static SDL_AppResult _event(GameState *gs, SDL_Event *event)
             .y = event->motion.y};
 
         SDL_Point p = hex_from_pixel(gs, m);
-        if (field_is_valid(gs, p))
+        if (field_is_valid(gs, &p))
         {
             _current.x = p.x;
             _current.y = p.y;

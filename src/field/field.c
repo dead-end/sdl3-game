@@ -65,10 +65,10 @@ void field_cleanup(GameState *gs)
 /**
  * The method checks if a hex coordinate is on the board.
  */
-bool field_is_valid(const GameState *gs, const SDL_Point hex)
+bool field_is_valid(const GameState *gs, const SDL_Point *field)
 {
-    return 0 <= hex.x && hex.x < gs->fields_num.x &&
-           0 <= hex.y && hex.y < gs->fields_num.y;
+    return 0 <= field->x && field->x < gs->fields_num.x &&
+           0 <= field->y && field->y < gs->fields_num.y;
 }
 
 /**
