@@ -100,9 +100,8 @@ static SDL_Point _axial_round(SDL_FPoint fAxial)
  *
  * See: https://www.redblobgames.com/grids/hexagons/
  */
-// TODO: function name
-// TODO: Pointer mouseRel
-SDL_Point hex_from_pixel(const GameState *gs, const SDL_FPoint mouseRel)
+// TODO: Return value by ref?
+SDL_Point field_from_pixel(const GameState *gs, const SDL_FPoint *mouseRel)
 {
     //
     // The function is called with the mouse position relative to the camera.
@@ -110,8 +109,8 @@ SDL_Point hex_from_pixel(const GameState *gs, const SDL_FPoint mouseRel)
     // the top left hexagon.
     //
     const SDL_FPoint mouseAbs = {
-        .x = mouseRel.x + gs->camera.x - gs->field_origin.x,
-        .y = mouseRel.y + gs->camera.y - gs->field_origin.y};
+        .x = mouseRel->x + gs->camera.x - gs->field_origin.x,
+        .y = mouseRel->y + gs->camera.y - gs->field_origin.y};
 
     //
     // ⎡q⎤     ⎡   2/3         0    ⎤   ⎛ ⎡x⎤        ⎞

@@ -1,7 +1,6 @@
 #include <SDL3/SDL.h>
 
 #include "drawable.h"
-#include "hexagon.h"
 #include "field.h"
 
 /**

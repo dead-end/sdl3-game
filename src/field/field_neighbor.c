@@ -28,9 +28,9 @@ static const SDL_Point _NEIGHBOR_ODD[] = {
  * The function returns the coordinates of neighbor of a hexagon in a given
  * direction.
  */
-bool field_neighbor(const GameState *gs, const SDL_Point hex, const int i, SDL_Point *neighbor)
+bool field_neighbor(const GameState *gs, const SDL_Point *field, const int i, SDL_Point *neighbor)
 {
-    const SDL_Point *neighbors = hex.x % 2 == 0 ? _NEIGHBOR_EVEN : _NEIGHBOR_ODD;
+    const SDL_Point *neighbors = field->x % 2 == 0 ? _NEIGHBOR_EVEN : _NEIGHBOR_ODD;
 
     int idx = i % 6;
     if (idx < 0)
@@ -38,8 +38,8 @@ bool field_neighbor(const GameState *gs, const SDL_Point hex, const int i, SDL_P
         idx += 6;
     }
 
-    neighbor->x = hex.x + neighbors[idx].x;
-    neighbor->y = hex.y + neighbors[idx].y;
+    neighbor->x = field->x + neighbors[idx].x;
+    neighbor->y = field->y + neighbors[idx].y;
 
     return field_is_valid(gs, neighbor);
 };

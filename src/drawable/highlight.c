@@ -3,7 +3,6 @@
 #include "game_state.h"
 #include "drawable.h"
 #include "field.h"
-#include "hexagon.h"
 
 //
 // The highlighted field. The event function sets the values and the render
@@ -34,7 +33,7 @@ SDL_AppResult _draw_hexagon(GameState *gs,
     //
     for (int i = 0; i < 6; i++)
     {
-        hex_corner(gs, center, i, &vertices[i + 1].position);
+        field_corner(gs, center, i, &vertices[i + 1].position);
         vertices[i + 1].color = color;
     }
 
@@ -140,7 +139,7 @@ static SDL_AppResult _event(GameState *gs, SDL_Event *event)
             .x = event->motion.x,
             .y = event->motion.y};
 
-        SDL_Point p = hex_from_pixel(gs, m);
+        SDL_Point p = field_from_pixel(gs, &m);
         if (field_is_valid(gs, &p))
         {
             _current.x = p.x;

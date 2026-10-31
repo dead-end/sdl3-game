@@ -14,7 +14,7 @@ static const SDL_FPoint _CORNERS[] = {
 /**
  * The function is called with the center of a hex and computes its corners.
  */
-void hex_corner(const GameState *gs, const SDL_FPoint *center, const int corner_i, SDL_FPoint *corner)
+void field_corner(const GameState *gs, const SDL_FPoint *center, const int corner_i, SDL_FPoint *corner)
 {
     //
     // corner_i can be 6

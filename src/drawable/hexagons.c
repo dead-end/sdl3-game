@@ -1,7 +1,6 @@
 #include <SDL3/SDL.h>
 
 #include "drawable.h"
-#include "hexagon.h"
 #include "field.h"
 
 static SDL_Texture *_texture = NULL;
@@ -58,7 +57,7 @@ static SDL_AppResult _fields_render(GameState *gs)
             {
 
                 SDL_Point neighbor;
-                const bool is_valid = field_neighbor(gs, field->hex, i, &neighbor);
+                const bool is_valid = field_neighbor(gs, &field->hex, i, &neighbor);
 
                 //
                 // If the hexagon has no neighbor in this direction or the hexagon in
@@ -66,8 +65,8 @@ static SDL_AppResult _fields_render(GameState *gs)
                 //
                 if (!is_valid || !initialized[neighbor.x][neighbor.y])
                 {
-                    hex_corner(gs, &center, i, &start);
-                    hex_corner(gs, &center, i + 1, &end);
+                    field_corner(gs, &center, i, &start);
+                    field_corner(gs, &center, i + 1, &end);
 
                     if (!SDL_RenderLine(gs->renderer, start.x, start.y, end.x, end.y))
                     {
