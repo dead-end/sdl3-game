@@ -5,65 +5,7 @@
 #include "sprite.h"
 #include "move.h"
 
-typedef enum EDirection
-{
-    E_DIR_LEFT = -1,
-    E_DIR_RIGHT = 1
-} EDirection;
-
-typedef struct Rotate
-{
-    int direction;
-    float speed;
-    bool rotating;
-} Rotate;
-
-static Rotate _rotate = {0};
-
-typedef struct Move
-{
-    SDL_FPoint target;
-    SDL_FPoint direction;
-    float speed;
-    bool moving;
-    SDL_Point neighbor;
-} Move;
-
 static Move _move = {0};
-
-void move_init(const GameState *gs, Move *move, const SDL_Point *start, const SDL_Point *neighbor, const SDL_FRect *abs)
-{
-    SDL_Log("move init start: %d, %d neighbor: %d, %d", start->x, start->y, neighbor->x, neighbor->y);
-
-    field_rect_corner(gs, neighbor, abs->w, abs->h, &move->target);
-
-    //
-    // The direction vector works because we move to a neighbor, so the length
-    // is always the same. If we move to an other place, then the speed will be
-    // different.
-    //
-    move->direction.x = abs->x - move->target.x;
-    move->direction.y = abs->y - move->target.y;
-
-    move->speed = 1.0f;
-    move->moving = true;
-
-    move->neighbor.x = neighbor->x;
-    move->neighbor.y = neighbor->y;
-}
-
-void rotate_init(Rotate *rotate, const int target_direction, const float speed)
-{
-    rotate->speed = speed;
-
-    rotate->direction = target_direction % 6;
-    if (rotate->direction < 0)
-    {
-        rotate->direction += 6;
-    }
-
-    rotate->rotating = true;
-}
 
 typedef struct Starship
 {
@@ -133,26 +75,26 @@ static SDL_AppResult _event(GameState *gs, SDL_Event *event)
         switch (event->key.key)
         {
         case SDLK_L:
-            if (!_rotate.rotating)
+            if (_move.type == E_MOVE_NOT)
             {
-                rotate_init(&_rotate, _starship.direction + E_DIR_LEFT, 60.0);
+                move_rotate_init(&_move, _starship.direction + E_DIR_LEFT, 80.0);
             }
             break;
 
         case SDLK_R:
-            if (!_rotate.rotating)
+            if (_move.type == E_MOVE_NOT)
             {
-                rotate_init(&_rotate, _starship.direction + E_DIR_RIGHT, 60.0);
+                move_rotate_init(&_move, _starship.direction + E_DIR_RIGHT, 80.0);
             }
             break;
 
         case SDLK_F:
-            if (!_move.moving)
+            if (_move.type == E_MOVE_NOT)
             {
                 SDL_Point neighbor;
                 if (field_neighbor(gs, &_starship.field, _starship.direction, &neighbor))
                 {
-                    move_init(gs, &_move, &_starship.field, &neighbor, &_starship.abs);
+                    move_direction_init(gs, &_move, &neighbor, &_starship.abs, 1.0f);
                 }
             }
             break;
@@ -170,27 +112,31 @@ static SDL_AppResult _update(GameState *gs, double delta_time)
 
     sprite_update(&_starship.sprite, delta_time);
 
-    if (_rotate.rotating)
+    switch (_move.type)
     {
-        SDL_Log("rote");
-        _rotate.rotating = move_rotate(&_starship.angle, _rotate.direction, _rotate.speed, delta_time);
-
-        if (!_rotate.rotating)
+    case E_MOVE_ROTATE:
+        if (!move_rotate(&_starship.angle, _move.rotate.dst_angle, _move.speed, delta_time))
         {
-            _starship.direction = _rotate.direction;
-            _starship.angle = _starship.direction * 60.0;
-        }
-    }
+            _move.type = E_MOVE_NOT;
 
-    if (_move.moving)
-    {
-        SDL_Log("move");
-        _move.moving = move_direction(&_move.target, &_move.direction, _move.speed, delta_time, &_starship.abs);
-        if (!_move.moving)
-        {
-            _starship.field.x = _move.neighbor.x;
-            _starship.field.y = _move.neighbor.y;
+            _starship.direction = _move.rotate.dst_direction;
+            _starship.angle = _move.rotate.dst_angle;
         }
+        break;
+
+    case E_MOVE_DIRECTION:
+
+        if (!move_direction(&_move.direction.dst_corner, &_move.direction.direction, _move.speed, delta_time, &_starship.abs))
+        {
+            _move.type = E_MOVE_NOT;
+
+            _starship.field.x = _move.direction.neighbor.x;
+            _starship.field.y = _move.direction.neighbor.y;
+        }
+        break;
+
+    default:
+        break;
     }
 
     return SDL_APP_CONTINUE;

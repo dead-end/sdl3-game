@@ -37,10 +37,8 @@ bool move_direction(const SDL_FPoint *target, const SDL_FPoint *direction, const
  *
  * The function returns true if we have not reached the target angle.
  */
-bool move_rotate(double *current_angle, int target_direction, float speed, double delta_time)
+bool move_rotate(double *current_angle, const double target_angle, const float speed, const double delta_time)
 {
-    const double target_angle = target_direction * 60.0;
-
     //
     // Compute the difference between the current and the target angle and
     // normalize it to [-180, 180]
