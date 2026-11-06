@@ -77,9 +77,9 @@ bool field_is_valid(const GameState *gs, const SDL_Point *field)
 bool field_abs_to_camera(const GameState *gs, const SDL_FRect *abs, SDL_FRect *rel)
 {
     //
-    // If the rect is not on the camera rect, there is nothing to do.
+    // If the absolute rect is not on the camera rect, there is nothing to do.
     //
-    if (!SDL_HasRectIntersectionFloat(rel, &gs->camera))
+    if (!SDL_HasRectIntersectionFloat(abs, &gs->camera))
     {
         return false;
     }
