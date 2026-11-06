@@ -1,6 +1,7 @@
 #include <SDL3/SDL.h>
 
 #include "game_state.h"
+#include "field.h"
 #include "sprite.h"
 
 /**
@@ -43,6 +44,12 @@ SDL_AppResult sprite_init(GameState *gs, Sprite *sprite, const char *file, const
     sprite->src.w = sprite->sheet->w / sprite->num_frames;
     sprite->src.h = sprite->sheet->h;
 
+    //
+    // Set the width and height of the sprite
+    //
+    sprite->abs.w = sprite->src.w;
+    sprite->abs.h = sprite->src.h;
+
     return SDL_APP_CONTINUE;
 }
 
@@ -76,4 +83,24 @@ void sprite_cleanup(Sprite *sprite)
         SDL_DestroyTexture(sprite->sheet);
         sprite->sheet = NULL;
     }
+}
+
+/**
+ * The function places a sprite on a field.
+ */
+void sprite_on_field(const GameState *gs, const Pose *pose, Sprite *sprite)
+{
+    //
+    // Get the center of the field
+    //
+    SDL_FPoint center;
+    field_center(gs, &pose->field, &center);
+
+    //
+    // Place the rect over the center.
+    //
+    sprite->abs.x = center.x - (sprite->abs.w * 0.5);
+    sprite->abs.y = center.y - (sprite->abs.h * 0.5);
+
+    sprite->angle = pose->direction * 60.0;
 }
