@@ -54,6 +54,18 @@ SDL_AppResult sprite_init(GameState *gs, Sprite *sprite, const char *file, const
 }
 
 /**
+ * The function frees the texture of the sprite
+ */
+void sprite_cleanup(Sprite *sprite)
+{
+    if (sprite && sprite->sheet)
+    {
+        SDL_DestroyTexture(sprite->sheet);
+        sprite->sheet = NULL;
+    }
+}
+
+/**
  * The function changes the current frame of the sprite, if necessary.
  */
 void sprite_update(Sprite *sprite, const double delta_time)
@@ -74,15 +86,27 @@ void sprite_update(Sprite *sprite, const double delta_time)
 }
 
 /**
- * The function frees the texture of the sprite
+ * The function renders the sprite if it is visible.
  */
-void sprite_cleanup(Sprite *sprite)
+SDL_AppResult sprite_render(const GameState *gs, const Sprite *sprite)
 {
-    if (sprite && sprite->sheet)
+    SDL_FRect camera;
+    //
+    // The function returns false if the intersection of the sprite and the
+    // camera is empty.
+    //
+    if (!field_abs_to_camera(gs, &sprite->abs, &camera))
     {
-        SDL_DestroyTexture(sprite->sheet);
-        sprite->sheet = NULL;
+        return SDL_APP_CONTINUE;
     }
+
+    if (!SDL_RenderTextureRotated(gs->renderer, sprite->sheet, &sprite->src, &camera, sprite->angle, NULL, SDL_FLIP_NONE))
+    {
+        SDL_Log("SDL_RenderTextureRotated: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
+
+    return SDL_APP_CONTINUE;
 }
 
 /**

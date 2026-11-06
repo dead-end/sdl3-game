@@ -33,9 +33,11 @@ typedef struct Sprite
 
 SDL_AppResult sprite_init(GameState *gs, Sprite *sprite, const char *file, const int num_frames, const double frame_duration);
 
+void sprite_cleanup(Sprite *sprite);
+
 void sprite_update(Sprite *sprite, const double delta_time);
 
-void sprite_cleanup(Sprite *sprite);
+SDL_AppResult sprite_render(const GameState *gs, const Sprite *sprite);
 
 void sprite_on_field(const GameState *gs, const Pose *pose, Sprite *sprite);
 
