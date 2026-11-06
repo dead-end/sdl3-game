@@ -110,25 +110,6 @@ void field_top_left(const GameState *gs, const SDL_Point *field, SDL_FPoint *top
     top_left->y = field->y * gs->vSpace + ((field->x % 2) * gs->vSpace) / 2.0f;
 };
 
-// TODO: It is not clear what is the best way to deal with the width and height.
-/**
- * The function places a rect on a field.
- */
-void field_place_frect(const GameState *gs, const SDL_Point *field, SDL_FRect *rect)
-{
-    //
-    // Get the center of the field
-    //
-    SDL_FPoint center;
-    field_center(gs, field, &center);
-
-    //
-    // Place the rect over the center.
-    //
-    rect->x = center.x - (rect->w * 0.5);
-    rect->y = center.y - (rect->h * 0.5);
-}
-
 /**
  * The function computes the corner of a rectangle, places on a field with a
  * given width and height.
