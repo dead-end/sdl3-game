@@ -32,6 +32,7 @@ SRC_FILES = src/main.c \
             src/drawable/highlight.c \
             src/game/game_state.c \
             src/sprite/sprite.c \
+            src/sprite/pose.c \
             src/move/move.c \
             src/move/move_base.c \
 
