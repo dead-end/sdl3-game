@@ -9,13 +9,8 @@ static Move _move = {0};
 
 typedef struct Starship
 {
-    SDL_Point field;
-    int direction;
-
+    Pose pose;
     Sprite sprite;
-
-    double angle;
-    SDL_FRect abs;
 } Starship;
 
 static Starship _starship;
@@ -32,15 +27,9 @@ static SDL_AppResult _init(GameState *gs)
         return result;
     }
 
-    _starship.field.x = 5;
-    _starship.field.y = 5;
+    pose_init(&_starship.pose, 5, 5, 0);
 
-    _starship.direction = 0;
-    _starship.angle = 0.0;
-
-    _starship.abs.w = _starship.sprite.src.w;
-    _starship.abs.h = _starship.sprite.src.h;
-    field_place_frect(gs, &_starship.field, &_starship.abs);
+    sprite_on_field(gs, &_starship.pose, &_starship.sprite);
 
     return SDL_APP_CONTINUE;
 }
@@ -77,14 +66,14 @@ static SDL_AppResult _event(GameState *gs, SDL_Event *event)
         case SDLK_L:
             if (_move.type == E_MOVE_NOT)
             {
-                move_rotate_init(&_move, _starship.direction + E_DIR_LEFT, 80.0);
+                move_rotate_init(&_move, _starship.pose.direction + E_DIR_LEFT, 80.0);
             }
             break;
 
         case SDLK_R:
             if (_move.type == E_MOVE_NOT)
             {
-                move_rotate_init(&_move, _starship.direction + E_DIR_RIGHT, 80.0);
+                move_rotate_init(&_move, _starship.pose.direction + E_DIR_RIGHT, 80.0);
             }
             break;
 
@@ -92,9 +81,9 @@ static SDL_AppResult _event(GameState *gs, SDL_Event *event)
             if (_move.type == E_MOVE_NOT)
             {
                 SDL_Point neighbor;
-                if (field_neighbor(gs, &_starship.field, _starship.direction, &neighbor))
+                if (field_neighbor(gs, &_starship.pose.field, _starship.pose.direction, &neighbor))
                 {
-                    move_direction_init(gs, &_move, &neighbor, &_starship.abs, 1.0f);
+                    move_direction_init(gs, &_move, &neighbor, &_starship.sprite.abs, 1.0f);
                 }
             }
             break;
@@ -115,23 +104,23 @@ static SDL_AppResult _update(GameState *gs, double delta_time)
     switch (_move.type)
     {
     case E_MOVE_ROTATE:
-        if (!move_rotate(&_starship.angle, _move.rotate.dst_angle, _move.speed, delta_time))
+        if (!move_rotate(&_starship.sprite.angle, _move.rotate.dst_angle, _move.speed, delta_time))
         {
             _move.type = E_MOVE_NOT;
 
-            _starship.direction = _move.rotate.dst_direction;
-            _starship.angle = _move.rotate.dst_angle;
+            _starship.pose.direction = _move.rotate.dst_direction;
+            _starship.sprite.angle = _move.rotate.dst_angle;
         }
         break;
 
     case E_MOVE_DIRECTION:
 
-        if (!move_direction(&_move.direction.dst_corner, &_move.direction.direction, _move.speed, delta_time, &_starship.abs))
+        if (!move_direction(&_move.direction.dst_corner, &_move.direction.direction, _move.speed, delta_time, &_starship.sprite.abs))
         {
             _move.type = E_MOVE_NOT;
 
-            _starship.field.x = _move.direction.neighbor.x;
-            _starship.field.y = _move.direction.neighbor.y;
+            _starship.pose.field.x = _move.direction.neighbor.x;
+            _starship.pose.field.y = _move.direction.neighbor.y;
         }
         break;
 
@@ -144,19 +133,7 @@ static SDL_AppResult _update(GameState *gs, double delta_time)
 
 static SDL_AppResult _render(GameState *gs)
 {
-    SDL_FRect camera;
-    if (!field_abs_to_camera(gs, &_starship.abs, &camera))
-    {
-        return SDL_APP_CONTINUE;
-    }
-
-    if (!SDL_RenderTextureRotated(gs->renderer, _starship.sprite.sheet, &_starship.sprite.src, &camera, _starship.angle, NULL, SDL_FLIP_NONE))
-    {
-        SDL_Log("SDL_RenderTextureRotated: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
-
-    return SDL_APP_CONTINUE;
+    return sprite_render(gs, &_starship.sprite);
 }
 
 Drawable Spaceship_Create()
