@@ -33,8 +33,8 @@ SRC_FILES = src/main.c \
             src/game/game_state.c \
             src/sprite/sprite.c \
             src/sprite/pose.c \
-            src/move/move.c \
-            src/move/move_base.c \
+            src/move/move_direction.c \
+            src/move/move_rotate.c \
 
 # ------------------------------------------------------------------------------
 # WebAssembly & SDL3 Linker-Flags

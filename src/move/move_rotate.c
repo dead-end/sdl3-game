@@ -1,34 +1,26 @@
 
 #include <SDL3/SDL.h>
 
+#include "move.h"
+
 /**
- * The function moves a rect along a direction vector. To have a consistent
- * speed, the direction vector has to be normalized.
- *
- * The function returns true if we have not reached the target.
+ * The function initializes the move struct for a rotation.
  */
-bool move_direction(const SDL_FPoint *target, const SDL_FPoint *direction, const float speed, const double delta_time, SDL_FRect *abs)
+void move_rotate_init(Move *move, const int target_direction, const float speed)
 {
-    //
-    // Compute the delta.
-    //
-    const float dx = speed * delta_time * direction->x;
-    const float dy = speed * delta_time * direction->y;
+    move->type = E_MOVE_ROTATE;
+    move->speed = speed;
 
     //
-    // If we are near the target, we return the target.
+    // Ensure that target direction is positive
     //
-    if (SDL_fabsf(target->x - abs->x) <= SDL_fabsf(dx) &&
-        SDL_fabsf(target->y - abs->y) <= SDL_fabsf(dy))
+    move->rotate.dst_direction = target_direction % 6;
+    if (move->rotate.dst_direction < 0)
     {
-        abs->x = target->x;
-        abs->y = target->y;
-        return false;
+        move->rotate.dst_direction += 6;
     }
 
-    abs->x -= dx;
-    abs->y -= dy;
-    return true;
+    move->rotate.dst_angle = move->rotate.dst_direction * 60.0;
 }
 
 /**

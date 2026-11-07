@@ -3,6 +3,8 @@
 
 #include <SDL3/SDL.h>
 
+#include "game_state.h"
+
 typedef enum EDirection
 {
     E_DIR_LEFT = -1,
