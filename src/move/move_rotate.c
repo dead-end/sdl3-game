@@ -11,7 +11,7 @@
 void move_rotate_init(Move *move, const int target_direction, const float speed)
 {
     move->type = E_MOVE_ROTATE;
-    move->speed = speed;
+    move->rotate.speed = speed;
 
     //
     // Ensure that target direction is positive

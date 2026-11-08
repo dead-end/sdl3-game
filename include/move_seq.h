@@ -22,8 +22,6 @@ typedef struct MoveSeq
     Pose *pose;
     Sprite *sprite;
 
-    float speed;
-
     union
     {
         MoveRotate rotate;

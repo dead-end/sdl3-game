@@ -20,21 +20,25 @@ typedef enum EMoveType
 
 typedef struct MoveRotate
 {
+    float speed;
+
     double dst_angle;
     int dst_direction;
 } MoveRotate;
 
 typedef struct MoveDirection
 {
+    float speed;
+
     SDL_FPoint dst_corner;
     SDL_FPoint direction;
     SDL_Point neighbor;
+
 } MoveDirection;
 
 typedef struct Move
 {
     EMoveType type;
-    float speed;
 
     union
     {
@@ -43,11 +47,7 @@ typedef struct Move
     };
 } Move;
 
-void move_direction_init(const GameState *gs, Move *move, const SDL_Point *neighbor, const SDL_FRect *src_corner, const float speed);
-
 bool move_direction(const SDL_FPoint *target, const SDL_FPoint *direction, const float speed, const double delta_time, SDL_FRect *abs);
-
-void move_rotate_init(Move *move, const int target_direction, const float speed);
 
 bool move_rotate(double *current_angle, const double target_angle, const float speed, const double delta_time);
 

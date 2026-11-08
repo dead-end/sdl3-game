@@ -12,7 +12,7 @@
 void move_direction_init(const GameState *gs, Move *move, const SDL_Point *neighbor, const SDL_FRect *src_corner, const float speed)
 {
     move->type = E_MOVE_DIRECTION;
-    move->speed = speed;
+    move->direction.speed = speed;
 
     field_rect_corner(gs, neighbor, src_corner->w, src_corner->h, &move->direction.dst_corner);
 
