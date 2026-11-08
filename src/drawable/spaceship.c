@@ -3,9 +3,9 @@
 #include "drawable.h"
 #include "field.h"
 #include "sprite.h"
-#include "move.h"
+#include "move_seq.h"
 
-static Move _move = {0};
+static MoveSeq _move_seq = {0};
 
 typedef struct Starship
 {
@@ -63,28 +63,25 @@ static SDL_AppResult _event(GameState *gs, SDL_Event *event)
     case SDL_EVENT_KEY_DOWN:
         switch (event->key.key)
         {
-        case SDLK_L:
-            if (_move.type == E_MOVE_NOT)
+        case SDLK_1:
+            if (!_move_seq.moving)
             {
-                move_rotate_init(&_move, _starship.pose.direction + E_DIR_LEFT, 80.0);
+                move_seq_init(gs, &_move_seq, &_starship.pose, &_starship.sprite, MOVE_SEQ_LEFT);
+            }
+
+            break;
+
+        case SDLK_3:
+            if (!_move_seq.moving)
+            {
+                move_seq_init(gs, &_move_seq, &_starship.pose, &_starship.sprite, MOVE_SEQ_FORWARD);
             }
             break;
 
-        case SDLK_R:
-            if (_move.type == E_MOVE_NOT)
+        case SDLK_5:
+            if (!_move_seq.moving)
             {
-                move_rotate_init(&_move, _starship.pose.direction + E_DIR_RIGHT, 80.0);
-            }
-            break;
-
-        case SDLK_F:
-            if (_move.type == E_MOVE_NOT)
-            {
-                SDL_Point neighbor;
-                if (field_neighbor(gs, &_starship.pose.field, _starship.pose.direction, &neighbor))
-                {
-                    move_direction_init(gs, &_move, &neighbor, &_starship.sprite.abs, 1.0f);
-                }
+                move_seq_init(gs, &_move_seq, &_starship.pose, &_starship.sprite, MOVE_SEQ_RIGHT);
             }
             break;
         }
@@ -97,35 +94,11 @@ static SDL_AppResult _event(GameState *gs, SDL_Event *event)
 
 static SDL_AppResult _update(GameState *gs, double delta_time)
 {
-    (void)gs;
-
     sprite_update(&_starship.sprite, delta_time);
 
-    switch (_move.type)
+    if (_move_seq.moving)
     {
-    case E_MOVE_ROTATE:
-        if (!move_rotate(&_starship.sprite.angle, _move.rotate.dst_angle, _move.speed, delta_time))
-        {
-            _move.type = E_MOVE_NOT;
-
-            _starship.pose.direction = _move.rotate.dst_direction;
-            _starship.sprite.angle = _move.rotate.dst_angle;
-        }
-        break;
-
-    case E_MOVE_DIRECTION:
-
-        if (!move_direction(&_move.direction.dst_corner, &_move.direction.direction, _move.speed, delta_time, &_starship.sprite.abs))
-        {
-            _move.type = E_MOVE_NOT;
-
-            _starship.pose.field.x = _move.direction.neighbor.x;
-            _starship.pose.field.y = _move.direction.neighbor.y;
-        }
-        break;
-
-    default:
-        break;
+        return move_seq_update(gs, &_move_seq, delta_time);
     }
 
     return SDL_APP_CONTINUE;
