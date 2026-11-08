@@ -35,6 +35,7 @@ SRC_FILES = src/main.c \
             src/sprite/pose.c \
             src/move/move_direction.c \
             src/move/move_rotate.c \
+            src/move/move_seq.c \
 
 # ------------------------------------------------------------------------------
 # WebAssembly & SDL3 Linker-Flags
