@@ -7,6 +7,8 @@
 /**
  * The function initializes the move struct for a movement in a direction.
  */
+// TODO: not used
+// TODO: use MoveDirection
 void move_direction_init(const GameState *gs, Move *move, const SDL_Point *neighbor, const SDL_FRect *src_corner, const float speed)
 {
     move->type = E_MOVE_DIRECTION;

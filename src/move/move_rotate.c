@@ -6,6 +6,8 @@
 /**
  * The function initializes the move struct for a rotation.
  */
+// TODO: not used
+// TODO: user MoveRotate instead of Move
 void move_rotate_init(Move *move, const int target_direction, const float speed)
 {
     move->type = E_MOVE_ROTATE;
