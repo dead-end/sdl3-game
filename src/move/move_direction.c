@@ -1,33 +1,6 @@
 
 #include <SDL3/SDL.h>
 
-#include "move.h"
-#include "field.h"
-
-/**
- * The function initializes the move struct for a movement in a direction.
- */
-// TODO: not used
-// TODO: use MoveDirection
-void move_direction_init(const GameState *gs, Move *move, const SDL_Point *neighbor, const SDL_FRect *src_corner, const float speed)
-{
-    move->type = E_MOVE_DIRECTION;
-    move->direction.speed = speed;
-
-    field_rect_corner(gs, neighbor, src_corner->w, src_corner->h, &move->direction.dst_corner);
-
-    //
-    // The direction vector works because we move to a neighbor, so the length
-    // is always the same. If we move to an other place, then the speed will be
-    // different.
-    //
-    move->direction.direction.x = src_corner->x - move->direction.dst_corner.x;
-    move->direction.direction.y = src_corner->y - move->direction.dst_corner.y;
-
-    move->direction.neighbor.x = neighbor->x;
-    move->direction.neighbor.y = neighbor->y;
-}
-
 /**
  * The function moves a rect along a direction vector. To have a consistent
  * speed, the direction vector has to be normalized.

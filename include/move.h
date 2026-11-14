@@ -11,13 +11,6 @@ typedef enum EDirection
     E_DIR_RIGHT = 1
 } EDirection;
 
-typedef enum EMoveType
-{
-    E_MOVE_ROTATE,
-    E_MOVE_DIRECTION,
-    E_MOVE_NOT
-} EMoveType;
-
 typedef struct MoveRotate
 {
     float speed;
@@ -36,19 +29,8 @@ typedef struct MoveDirection
 
 } MoveDirection;
 
-typedef struct Move
-{
-    EMoveType type;
-
-    union
-    {
-        MoveRotate rotate;
-        MoveDirection direction;
-    };
-} Move;
-
 bool move_direction(const SDL_FPoint *target, const SDL_FPoint *direction, const float speed, const double delta_time, SDL_FRect *abs);
 
-bool move_rotate(double *current_angle, const double target_angle, const float speed, const double delta_time);
+bool move_rotate(const double target_angle, const float speed, const double delta_time, double *current_angle);
 
 #endif
