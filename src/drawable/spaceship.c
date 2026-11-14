@@ -64,24 +64,37 @@ static SDL_AppResult _event(GameState *gs, SDL_Event *event)
         switch (event->key.key)
         {
         case SDLK_1:
-            if (!_move_seq.moving)
+            if (!_move_seq.is_moving)
             {
-                move_seq_init(gs, &_move_seq, &_starship.pose, &_starship.sprite, MOVE_SEQ_LEFT);
+                move_seq_init(gs, MOVE_SEQ_HARD_LEFT, &_starship.pose, &_starship.sprite, &_move_seq);
             }
+            break;
 
+        case SDLK_2:
+            if (!_move_seq.is_moving)
+            {
+                move_seq_init(gs, MOVE_SEQ_LEFT, &_starship.pose, &_starship.sprite, &_move_seq);
+            }
             break;
 
         case SDLK_3:
-            if (!_move_seq.moving)
+            if (!_move_seq.is_moving)
             {
-                move_seq_init(gs, &_move_seq, &_starship.pose, &_starship.sprite, MOVE_SEQ_FORWARD);
+                move_seq_init(gs, MOVE_SEQ_FORWARD, &_starship.pose, &_starship.sprite, &_move_seq);
+            }
+            break;
+
+        case SDLK_4:
+            if (!_move_seq.is_moving)
+            {
+                move_seq_init(gs, MOVE_SEQ_RIGHT, &_starship.pose, &_starship.sprite, &_move_seq);
             }
             break;
 
         case SDLK_5:
-            if (!_move_seq.moving)
+            if (!_move_seq.is_moving)
             {
-                move_seq_init(gs, &_move_seq, &_starship.pose, &_starship.sprite, MOVE_SEQ_RIGHT);
+                move_seq_init(gs, MOVE_SEQ_HARD_RIGHT, &_starship.pose, &_starship.sprite, &_move_seq);
             }
             break;
         }
@@ -96,9 +109,9 @@ static SDL_AppResult _update(GameState *gs, double delta_time)
 {
     sprite_update(&_starship.sprite, delta_time);
 
-    if (_move_seq.moving)
+    if (_move_seq.is_moving)
     {
-        return move_seq_update(gs, &_move_seq, delta_time);
+        return move_seq_update(gs, delta_time, &_move_seq);
     }
 
     return SDL_APP_CONTINUE;

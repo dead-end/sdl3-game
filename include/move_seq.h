@@ -5,19 +5,19 @@
 #include "pose.h"
 #include "sprite.h"
 
-typedef enum EMove
+typedef enum EMoveType
 {
-    E_M_NOT = 0,
-    E_M_RIGHT,
-    E_M_LEFT,
-    E_M_FORWARD
-} EMove;
+    E_MOVE_STOP = 0,
+    E_MOVE_RIGHT,
+    E_MOVE_LEFT,
+    E_MOVE_FORWARD
+} EMoveType;
 
 typedef struct MoveSeq
 {
-    const EMove *sequence;
-    int idx;
-    bool moving;
+    const EMoveType *sequence;
+    int seq_idx;
+    bool is_moving;
 
     Pose *pose;
     Sprite *sprite;
@@ -29,12 +29,14 @@ typedef struct MoveSeq
     };
 } MoveSeq;
 
-static const EMove MOVE_SEQ_LEFT[] = {E_M_FORWARD, E_M_LEFT, E_M_FORWARD, E_M_LEFT, E_M_NOT};
-static const EMove MOVE_SEQ_RIGHT[] = {E_M_FORWARD, E_M_RIGHT, E_M_FORWARD, E_M_RIGHT, E_M_NOT};
-static const EMove MOVE_SEQ_FORWARD[] = {E_M_FORWARD, E_M_FORWARD, E_M_FORWARD, E_M_FORWARD, E_M_NOT};
+static const EMoveType MOVE_SEQ_HARD_LEFT[] = {E_MOVE_FORWARD, E_MOVE_LEFT, E_MOVE_FORWARD, E_MOVE_LEFT, E_MOVE_STOP};
+static const EMoveType MOVE_SEQ_HARD_RIGHT[] = {E_MOVE_FORWARD, E_MOVE_RIGHT, E_MOVE_FORWARD, E_MOVE_RIGHT, E_MOVE_STOP};
+static const EMoveType MOVE_SEQ_LEFT[] = {E_MOVE_FORWARD, E_MOVE_FORWARD, E_MOVE_LEFT, E_MOVE_FORWARD, E_MOVE_STOP};
+static const EMoveType MOVE_SEQ_RIGHT[] = {E_MOVE_FORWARD, E_MOVE_FORWARD, E_MOVE_RIGHT, E_MOVE_FORWARD, E_MOVE_STOP};
+static const EMoveType MOVE_SEQ_FORWARD[] = {E_MOVE_FORWARD, E_MOVE_FORWARD, E_MOVE_FORWARD, E_MOVE_FORWARD, E_MOVE_STOP};
 
-void move_seq_init(const GameState *gs, MoveSeq *move_seq, Pose *pose, Sprite *sprite, const EMove *sequence);
+void move_seq_init(const GameState *gs, const EMoveType *sequence, Pose *pose, Sprite *sprite, MoveSeq *move_seq);
 
-SDL_AppResult move_seq_update(const GameState *gs, MoveSeq *move_seq, double delta_time);
+SDL_AppResult move_seq_update(const GameState *gs, const double delta_time, MoveSeq *move_seq);
 
 #endif

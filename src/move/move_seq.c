@@ -52,12 +52,12 @@ static void _move_seq_rotate_init(const Pose *pose, const int target_direction, 
  */
 static SDL_AppResult _move_seq_next(const GameState *gs, MoveSeq *move_seq)
 {
-    move_seq->idx++;
+    move_seq->seq_idx++;
 
-    switch (move_seq->sequence[move_seq->idx])
+    switch (move_seq->sequence[move_seq->seq_idx])
     {
-    case E_MOVE_NOT:
-        move_seq->moving = false;
+    case E_MOVE_STOP:
+        move_seq->is_moving = false;
         break;
 
     case E_MOVE_LEFT:
@@ -93,9 +93,9 @@ static SDL_AppResult _move_seq_next(const GameState *gs, MoveSeq *move_seq)
 /**
  * The function updates the sprite with the delta time depending on the type of movement.
  */
-SDL_AppResult move_seq_update(const GameState *gs, MoveSeq *move_seq, double delta_time)
+SDL_AppResult move_seq_update(const GameState *gs, const double delta_time, MoveSeq *move_seq)
 {
-    switch (move_seq->sequence[move_seq->idx])
+    switch (move_seq->sequence[move_seq->seq_idx])
     {
     case E_MOVE_LEFT:
     case E_MOVE_RIGHT:
@@ -134,15 +134,15 @@ SDL_AppResult move_seq_update(const GameState *gs, MoveSeq *move_seq, double del
 /**
  * The function initializes a move sequence.
  */
-void move_seq_init(const GameState *gs, MoveSeq *move_seq, Pose *pose, Sprite *sprite, const EMove *sequence)
+void move_seq_init(const GameState *gs, const EMoveType *sequence, Pose *pose, Sprite *sprite, MoveSeq *move_seq)
 {
     move_seq->pose = pose;
     move_seq->sprite = sprite;
 
     move_seq->sequence = sequence;
 
-    move_seq->idx = -1;
-    move_seq->moving = true;
+    move_seq->seq_idx = -1;
+    move_seq->is_moving = true;
 
     _move_seq_next(gs, move_seq);
 }
