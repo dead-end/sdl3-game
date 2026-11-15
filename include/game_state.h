@@ -74,8 +74,6 @@ typedef struct GameState
 
 SDL_AppResult gs_init(GameState *gs, SDL_Renderer *renderer);
 
-SDL_FPoint gs_camera_to_board(float camera_x, float camera_y, float x, float y);
-
-void gs_abs_to_camera(GameState *gs, SDL_FPoint *p);
+void gs_frect_to_camera(GameState *gs, SDL_FRect *r);
 
 #endif

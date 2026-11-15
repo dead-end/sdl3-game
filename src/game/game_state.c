@@ -71,21 +71,11 @@ SDL_AppResult gs_init(GameState *gs, SDL_Renderer *renderer)
 }
 
 /**
- * The function compute the position on the camera for the absolute position.
- * The result may not on the camera.
+ * The function is called with a frect with an absolute position a the relative
+ * position to the camera is computed.
  */
-void gs_abs_to_camera(GameState *gs, SDL_FPoint *p)
+void gs_frect_to_camera(GameState *gs, SDL_FRect *r)
 {
-    p->x -= gs->camera.x;
-    p->y -= gs->camera.y;
-}
-
-/**
- * not used
- */
-SDL_FPoint gs_camera_to_board(float camera_x, float camera_y, float x, float y)
-{
-    return (SDL_FPoint){
-        .x = camera_x + x,
-        .y = camera_y + y};
+    r->x -= gs->camera.x;
+    r->y -= gs->camera.y;
 }
