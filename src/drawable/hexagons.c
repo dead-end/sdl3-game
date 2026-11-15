@@ -145,15 +145,16 @@ static SDL_AppResult _init(GameState *gs)
 /**
  * The function copies the camera part of the texture to the renderer.
  */
+// TODO: same function for background.c and hexagons.c
 static SDL_AppResult _render(GameState *gs)
 {
-    const SDL_FRect rect = {
-        .x = gs->camera.x,
-        .y = gs->camera.y,
+    const SDL_FRect dst_rect = {
+        .x = 0,
+        .y = 0,
         .w = gs->camera.w,
         .h = gs->camera.h,
     };
-    if (!SDL_RenderTexture(gs->renderer, _texture, &rect, NULL))
+    if (!SDL_RenderTexture(gs->renderer, _texture, &gs->camera, &dst_rect))
     {
         SDL_Log("SDL_RenderTexture: %s", SDL_GetError());
         return SDL_APP_FAILURE;
