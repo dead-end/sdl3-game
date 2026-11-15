@@ -104,6 +104,7 @@ void field_center(const GameState *gs, const SDL_Point *field, SDL_FPoint *cente
  * The function compute the position of the top left corner (0,0) of the origin
  * field to the top left corner on the current field.
  */
+// TODO: not used
 void field_top_left(const GameState *gs, const SDL_Point *field, SDL_FPoint *top_left)
 {
     top_left->x = field->x * gs->hSpace;
@@ -114,6 +115,7 @@ void field_top_left(const GameState *gs, const SDL_Point *field, SDL_FPoint *top
  * The function computes the corner of a rectangle, places on a field with a
  * given width and height.
  */
+// TODO: Why only corner? Better with: field_place_frect?
 void field_rect_corner(const GameState *gs, const SDL_Point *field, const int w, const int h, SDL_FPoint *corner)
 {
     //
@@ -127,4 +129,24 @@ void field_rect_corner(const GameState *gs, const SDL_Point *field, const int w,
     //
     corner->x = center.x - (w * 0.5);
     corner->y = center.y - (h * 0.5);
+}
+
+/**
+ * The function places a frect on a field.
+ */
+void field_place_frect(const GameState *gs, const SDL_Point *field, const int w, const int h, SDL_FRect *rect)
+{
+    //
+    // Get the center of the field
+    //
+    SDL_FPoint center;
+    field_center(gs, field, &center);
+
+    //
+    // Compute the corner of the rect over the center.
+    //
+    rect->x = center.x - (w * 0.5);
+    rect->y = center.y - (h * 0.5);
+    rect->w = w;
+    rect->h = h;
 }
