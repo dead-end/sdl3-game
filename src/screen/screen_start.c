@@ -14,6 +14,7 @@ typedef struct State
 {
     SDL_Renderer *renderer;
 
+    ButtonCtx btn_ctx;
     Button btn_start;
     Button btn_quit;
 } State;
@@ -58,7 +59,7 @@ static SDL_AppResult _init(SDL_Renderer *renderer)
     //
     // Initialize the button functions
     //
-    result = btn_init(renderer, BTN_W, BTN_H);
+    result = btn_init_ctx(renderer, BTN_W, BTN_H, &_state->btn_ctx);
     if (result != SDL_APP_CONTINUE)
     {
         return result;
@@ -67,13 +68,13 @@ static SDL_AppResult _init(SDL_Renderer *renderer)
     //
     // Set the buttons
     //
-    result = btn_set(&_state->btn_start, "Start", _callback_start, 100, 10, BTN_W, BTN_H);
+    result = btn_set(&_state->btn_start, &_state->btn_ctx, "Start", _callback_start, 100, 10, BTN_W, BTN_H);
     if (result != SDL_APP_CONTINUE)
     {
         return result;
     }
 
-    result = btn_set(&_state->btn_quit, "Quit", _callback_quit, 100, 100, BTN_W, BTN_H);
+    result = btn_set(&_state->btn_quit, &_state->btn_ctx, "Quit", _callback_quit, 100, 100, BTN_W, BTN_H);
     if (result != SDL_APP_CONTINUE)
     {
         return result;
@@ -159,10 +160,10 @@ static void _cleanup()
 {
     SDL_Log("StartScreen: cleanup");
 
-    btn_cleanup();
-
     if (_state)
     {
+        btn_cleanup_ctx(&_state->btn_ctx);
+
         SDL_free(_state);
         _state = NULL;
     }
