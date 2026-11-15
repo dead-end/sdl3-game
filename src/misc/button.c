@@ -9,12 +9,6 @@
 #define CHAR_W 8
 #define CHAR_H 8
 
-//
-// The textures: normal and highlight
-//
-static SDL_Texture *_texture_nl = NULL;
-static SDL_Texture *_texture_hl = NULL;
-
 /**
  * The function creates a texture and renders a rect on it.
  */
@@ -88,9 +82,10 @@ static SDL_AppResult _create_texture(SDL_Renderer *renderer, SDL_Texture **textu
 }
 
 /**
- * The init function creates the textures.
+ * The init function creates the textures and stores them in the button context.
  */
-SDL_AppResult btn_init(SDL_Renderer *renderer, const int w, const int h)
+// TODO: Maybe the context should be allocated here.
+SDL_AppResult btn_init_ctx(SDL_Renderer *renderer, const int w, const int h, ButtonCtx *btn_ctx)
 {
     SDL_AppResult result;
     SDL_Color color;
@@ -103,7 +98,7 @@ SDL_AppResult btn_init(SDL_Renderer *renderer, const int w, const int h)
     color.g = 50;
     color.r = 255;
 
-    result = _create_texture(renderer, &_texture_nl, w, h, color);
+    result = _create_texture(renderer, &btn_ctx->texture_nl, w, h, color);
     if (result != SDL_APP_CONTINUE)
     {
         return result;
@@ -117,7 +112,7 @@ SDL_AppResult btn_init(SDL_Renderer *renderer, const int w, const int h)
     color.g = 60;
     color.r = 255;
 
-    result = _create_texture(renderer, &_texture_hl, w, h, color);
+    result = _create_texture(renderer, &btn_ctx->texture_hl, w, h, color);
     if (result != SDL_APP_CONTINUE)
     {
         return result;
@@ -129,13 +124,13 @@ SDL_AppResult btn_init(SDL_Renderer *renderer, const int w, const int h)
 /**
  * The function initializes a button. No resources are allocated.
  */
-SDL_AppResult btn_set(Button *btn, const char *text, SDL_AppResult (*callback)(), const int x, const int y, const int w, const int h)
+SDL_AppResult btn_set(Button *btn, const ButtonCtx *btn_ctx, const char *text, SDL_AppResult (*callback)(), const int x, const int y, const int w, const int h)
 {
 
     //
     // Ensure that the button size is not greater than the textures.
     //
-    if (w > _texture_nl->w || h > _texture_nl->h)
+    if (w > btn_ctx->texture_nl->w || h > btn_ctx->texture_nl->h)
     {
         SDL_Log("Invalid button sizes!");
         return SDL_APP_FAILURE;
@@ -153,8 +148,7 @@ SDL_AppResult btn_set(Button *btn, const char *text, SDL_AppResult (*callback)()
 
     btn->mouse = false;
 
-    btn->texture_nl = _texture_nl;
-    btn->texture_hl = _texture_hl;
+    btn->ctx = btn_ctx;
 
     btn->callback = callback;
 
@@ -205,7 +199,7 @@ SDL_AppResult btn_event(SDL_Event *event, Button *btn)
  */
 SDL_AppResult btn_render(SDL_Renderer *renderer, Button *btn)
 {
-    SDL_Texture *texture = btn->mouse ? btn->texture_hl : btn->texture_nl;
+    SDL_Texture *texture = btn->mouse ? btn->ctx->texture_hl : btn->ctx->texture_nl;
 
     const SDL_FRect src = {
         .x = 0,
@@ -242,25 +236,32 @@ SDL_AppResult btn_render(SDL_Renderer *renderer, Button *btn)
 }
 
 /**
- * The function frees the texture.
+ * The function frees the textures.
  */
-void btn_cleanup()
+void btn_cleanup_ctx(ButtonCtx *btn_ctx)
 {
+    SDL_Log("Button cleanup");
+
+    if (!btn_ctx)
+    {
+        return;
+    }
+
     //
     // texture normal
     //
-    if (_texture_nl)
+    if (btn_ctx->texture_nl)
     {
-        SDL_DestroyTexture(_texture_nl);
+        SDL_DestroyTexture(btn_ctx->texture_nl);
     }
-    _texture_nl = NULL;
+    btn_ctx->texture_nl = NULL;
 
     //
     // texture highlight
     //
-    if (_texture_hl)
+    if (btn_ctx->texture_hl)
     {
-        SDL_DestroyTexture(_texture_hl);
+        SDL_DestroyTexture(btn_ctx->texture_hl);
     }
-    _texture_hl = NULL;
+    btn_ctx->texture_hl = NULL;
 }
