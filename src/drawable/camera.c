@@ -54,7 +54,7 @@ static SDL_AppResult _init(GameState *gs)
     //
     // Convert int to float
     //
-    gs->camera.w = w;
+    gs->camera.w = w - 200;
     gs->camera.h = h;
 
     return SDL_APP_CONTINUE;
