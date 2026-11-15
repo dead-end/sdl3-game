@@ -134,7 +134,7 @@ void field_rect_corner(const GameState *gs, const SDL_Point *field, const int w,
 /**
  * The function places a frect on a field.
  */
-void field_place_frect(const GameState *gs, const SDL_Point *field, const int w, const int h, SDL_FRect *rect)
+static void _field_place_frect(const GameState *gs, const SDL_Point *field, const int w, const int h, SDL_FRect *rect)
 {
     //
     // Get the center of the field
@@ -149,4 +149,41 @@ void field_place_frect(const GameState *gs, const SDL_Point *field, const int w,
     rect->y = center.y - (h * 0.5);
     rect->w = w;
     rect->h = h;
+}
+
+/**
+ * The function renders a texture on a field, if it is visible.
+ */
+SDL_AppResult field_render_texture(const GameState *gs, const SDL_Point *field, SDL_Texture *texture)
+{
+    SDL_FRect dst;
+
+    //
+    // Place the texture on the field, which gives the absolute position.
+    //
+    _field_place_frect(gs, field, texture->w, texture->h, &dst);
+
+    //
+    // Ensure that the texture is visible
+    //
+    if (!SDL_HasRectIntersectionFloat(&dst, &gs->camera))
+    {
+        return SDL_APP_CONTINUE;
+    }
+
+    //
+    // Get the postion relative to the camera.
+    //
+    gs_frect_to_camera(gs, &dst);
+
+    //
+    // Render the texture at the computed position.
+    //
+    if (!SDL_RenderTexture(gs->renderer, texture, NULL, &dst))
+    {
+        SDL_Log("SDL_RenderTexture: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
+
+    return SDL_APP_CONTINUE;
 }

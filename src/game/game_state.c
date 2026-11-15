@@ -74,7 +74,7 @@ SDL_AppResult gs_init(GameState *gs, SDL_Renderer *renderer)
  * The function is called with a frect with an absolute position a the relative
  * position to the camera is computed.
  */
-void gs_frect_to_camera(GameState *gs, SDL_FRect *r)
+void gs_frect_to_camera(const GameState *gs, SDL_FRect *r)
 {
     r->x -= gs->camera.x;
     r->y -= gs->camera.y;

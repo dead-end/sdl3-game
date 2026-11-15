@@ -25,6 +25,6 @@ bool field_abs_to_camera(const GameState *gs, const SDL_FRect *abs, SDL_FRect *r
 
 void field_rect_corner(const GameState *gs, const SDL_Point *field, const int w, const int h, SDL_FPoint *corner);
 
-void field_place_frect(const GameState *gs, const SDL_Point *field, const int w, const int h, SDL_FRect *rect);
+SDL_AppResult field_render_texture(const GameState *gs, const SDL_Point *field, SDL_Texture *texture);
 
 #endif
