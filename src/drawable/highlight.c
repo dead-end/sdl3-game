@@ -161,36 +161,7 @@ static SDL_AppResult _render(GameState *gs)
     //
     if (_current.x >= 0 && _current.y >= 0)
     {
-        //
-        // Get the top left corner of the field and get its position on the
-        // camera.
-        //
-        SDL_FPoint top_left;
-        field_top_left(gs, &_current, &top_left);
-        gs_abs_to_camera(gs, &top_left);
-
-        SDL_FRect dst = {
-            .x = top_left.x,
-            .y = top_left.y,
-            .w = _texture->w,
-            .h = _texture->h};
-
-        //
-        // Ensure that the texture is visible
-        //
-        if (!SDL_HasRectIntersectionFloat(&dst, &gs->camera))
-        {
-            return SDL_APP_CONTINUE;
-        }
-
-        //
-        // Render the texture at the computed position.
-        //
-        if (!SDL_RenderTexture(gs->renderer, _texture, NULL, &dst))
-        {
-            SDL_Log("SDL_RenderTexture: %s", SDL_GetError());
-            return SDL_APP_FAILURE;
-        }
+        return field_render_texture(gs, &_current, _texture);
     }
 
     return SDL_APP_CONTINUE;
