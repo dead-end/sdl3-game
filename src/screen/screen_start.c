@@ -3,6 +3,7 @@
 #include "screen_manager.h"
 #include "screen.h"
 #include "button.h"
+#include "utils.h"
 
 //
 // The size of the buttons
@@ -21,21 +22,34 @@ typedef struct State
 
 static State *_state = NULL;
 
-/**
- * The callback function for the start button.
- */
-static SDL_AppResult _callback_start()
+typedef enum E_SCR_BTN
 {
-    sm_change_screen(SCREEN_GAME);
-    return SDL_APP_CONTINUE;
-}
+    BTN_START,
+    BTN_QUIT
+} E_SCR_BTN;
 
 /**
- * The callback function for the quit button.
+ * The callback function for the click event.
  */
-static SDL_AppResult _callback_quit()
+static SDL_AppResult _callback(void *data)
 {
-    return SDL_APP_SUCCESS;
+    E_SCR_BTN btn = (E_SCR_BTN)PTR_TO_INT(data);
+
+    switch (btn)
+    {
+    case BTN_START:
+        sm_change_screen(SCREEN_GAME);
+        break;
+
+    case BTN_QUIT:
+        return SDL_APP_SUCCESS;
+
+    default:
+        SDL_Log("Unknown button id: %d", btn);
+        return SDL_APP_FAILURE;
+    }
+
+    return SDL_APP_CONTINUE;
 }
 
 /**
@@ -68,17 +82,19 @@ static SDL_AppResult _init(SDL_Renderer *renderer)
     //
     // Set the buttons
     //
-    result = btn_set(&_state->btn_start, &_state->btn_ctx, "Start", _callback_start, 100, 10, BTN_W, BTN_H);
+    result = btn_init(&_state->btn_start, &_state->btn_ctx, "Start", BTN_W, BTN_H, _callback, PTR_FROM_INT(BTN_START));
     if (result != SDL_APP_CONTINUE)
     {
         return result;
     }
+    btn_pos(&_state->btn_start, &(SDL_FPoint){100, 10});
 
-    result = btn_set(&_state->btn_quit, &_state->btn_ctx, "Quit", _callback_quit, 100, 100, BTN_W, BTN_H);
+    result = btn_init(&_state->btn_quit, &_state->btn_ctx, "Quit", BTN_W, BTN_H, _callback, PTR_FROM_INT(BTN_QUIT));
     if (result != SDL_APP_CONTINUE)
     {
         return result;
     }
+    btn_pos(&_state->btn_quit, &(SDL_FPoint){100, 100});
 
     return SDL_APP_CONTINUE;
 }
