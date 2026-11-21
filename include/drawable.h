@@ -30,4 +30,6 @@ Drawable Spaceship_Create();
 
 Drawable Highlight_Create();
 
+Drawable Ui_Create();
+
 #endif

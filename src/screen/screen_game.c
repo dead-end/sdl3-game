@@ -6,7 +6,7 @@
 #include "game_state.h"
 #include "field.h"
 
-#define NUM_DRAWABLES 6
+#define NUM_DRAWABLES 7
 
 // TODO: maybe we can store the parameter separately.
 typedef struct State
@@ -57,6 +57,7 @@ static SDL_AppResult _init(SDL_Renderer *renderer)
     _state->drawables[3] = Hexagons_Create();
     _state->drawables[4] = Highlight_Create();
     _state->drawables[5] = Spaceship_Create();
+    _state->drawables[6] = Ui_Create();
 
     //
     // Delegate the init call

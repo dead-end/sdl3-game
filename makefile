@@ -17,6 +17,8 @@ BUILD_TYPE ?= Release
 SRC_FILES = src/main.c \
 			src/misc/log.c \
             src/misc/button.c \
+            src/misc/layout.c \
+            src/misc/texture.c \
             src/field/field.c \
             src/field/field_neighbor.c \
             src/field/field_corners.c \
@@ -30,6 +32,7 @@ SRC_FILES = src/main.c \
             src/drawable/hexagons.c \
             src/drawable/spaceship.c \
             src/drawable/highlight.c \
+            src/drawable/ui.c \
             src/game/game_state.c \
             src/sprite/sprite.c \
             src/sprite/pose.c \
@@ -51,6 +54,14 @@ WASM_FLAGS = -sUSE_SDL=3 \
 ifeq ($(BUILD_TYPE), Release)
     CFLAGS += -O3
     WASM_FLAGS += -O3 -sMINIFY_HTML=1 -DSDL_ASSERT_LEVEL=0
+
+else ifeq ($(BUILD_TYPE), Mem)
+    CFLAGS += -g -O0
+    WASM_FLAGS += -g -O0 -sASSERTIONS=2 -sSAFE_HEAP=0
+    WASM_FLAGS += -sWASM=0
+    WASM_FLAGS += -fsanitize=address
+    #    WASM_FLAGS += -fsanitize=undefined
+
 else
     CFLAGS += -g -O0 -gsource-map
     WASM_FLAGS += -g -O0 -gsource-map -sASSERTIONS=2 -sSAFE_HEAP=1
