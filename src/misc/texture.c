@@ -3,7 +3,7 @@
 /**
  * The function creates a texture which is a simple rect with one color.
  */
-SDL_AppResult texture_create_fill(SDL_Renderer *renderer, SDL_Texture **texture, const int w, const int h, const SDL_Color color)
+SDL_AppResult texture_create_fill(SDL_Renderer *renderer, SDL_Texture **texture, const int w, const int h, const SDL_Color *color)
 {
     //
     // Ensure that the pointer is valid
@@ -41,7 +41,7 @@ SDL_AppResult texture_create_fill(SDL_Renderer *renderer, SDL_Texture **texture,
     //
     // Fill the rect
     //
-    if (!SDL_SetRenderDrawColor(renderer, color.a, color.b, color.g, color.r))
+    if (!SDL_SetRenderDrawColor(renderer, color->a, color->b, color->g, color->r))
     {
         SDL_Log("SDL_SetRenderDrawColor: %s", SDL_GetError());
         return SDL_APP_FAILURE;
