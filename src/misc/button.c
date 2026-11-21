@@ -1,6 +1,8 @@
 #include <SDL3/SDL.h>
 
 #include "button.h"
+#include "layout.h"
+#include "texture.h"
 
 //
 // The definition of the character sizes. These are the sizes of:
@@ -9,77 +11,19 @@
 #define CHAR_W 8
 #define CHAR_H 8
 
-/**
- * The function creates a texture and renders a rect on it.
- */
-static SDL_AppResult _create_texture(SDL_Renderer *renderer, SDL_Texture **texture, const int w, const int h, const SDL_Color color)
-{
-    //
-    // Ensure that the pointer is valid
-    //
-    if (texture == NULL)
-    {
-        SDL_Log("SDL_Texture pointer is null");
-        return SDL_APP_FAILURE;
-    }
+const SDL_Color BTN_COLOR_FG = {
+    .a = 50,
+    .b = 50,
+    .g = 50,
+    .r = 255,
+};
 
-    //
-    // Create the texture
-    //
-    *texture = SDL_CreateTexture(
-        renderer,
-        SDL_PIXELFORMAT_RGBA8888,
-        SDL_TEXTUREACCESS_TARGET,
-        w,
-        h);
-    if (*texture == NULL)
-    {
-        SDL_Log("SDL_CreateTexture: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
-
-    //
-    // Replace the renderer with the texture
-    //
-    if (!SDL_SetRenderTarget(renderer, *texture))
-    {
-        SDL_Log("SDL_SetRenderTarget: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
-
-    //
-    // Fill the rect
-    //
-    if (!SDL_SetRenderDrawColor(renderer, color.a, color.b, color.g, color.r))
-    {
-        SDL_Log("SDL_SetRenderDrawColor: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
-
-    SDL_FRect rect = {
-        .x = 0,
-        .y = 0,
-        .w = w,
-        .h = h,
-    };
-
-    if (!SDL_RenderFillRect(renderer, &rect))
-    {
-        SDL_Log("SDL_RenderFillRect: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
-
-    //
-    // Reset the renderer
-    //
-    if (!SDL_SetRenderTarget(renderer, NULL))
-    {
-        SDL_Log("SDL_SetRenderTarget: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
-
-    return SDL_APP_CONTINUE;
-}
+const SDL_Color BTN_COLOR_BG = {
+    .a = 60,
+    .b = 60,
+    .g = 60,
+    .r = 255,
+};
 
 /**
  * The init function creates the textures and stores them in the button context.
@@ -88,31 +32,20 @@ static SDL_AppResult _create_texture(SDL_Renderer *renderer, SDL_Texture **textu
 SDL_AppResult btn_init_ctx(SDL_Renderer *renderer, const int w, const int h, ButtonCtx *btn_ctx)
 {
     SDL_AppResult result;
-    SDL_Color color;
 
     //
-    // Create texture foreground
+    // Create the foreground texture
     //
-    color.a = 50;
-    color.b = 50;
-    color.g = 50;
-    color.r = 255;
-
-    result = _create_texture(renderer, &btn_ctx->texture_nl, w, h, color);
+    result = texture_create_fill(renderer, &btn_ctx->texture_nl, w, h, &BTN_COLOR_FG);
     if (result != SDL_APP_CONTINUE)
     {
         return result;
     }
 
     //
-    // Create texture foreground
+    // Create the background texture
     //
-    color.a = 60;
-    color.b = 60;
-    color.g = 60;
-    color.r = 255;
-
-    result = _create_texture(renderer, &btn_ctx->texture_hl, w, h, color);
+    result = texture_create_fill(renderer, &btn_ctx->texture_hl, w, h, &BTN_COLOR_BG);
     if (result != SDL_APP_CONTINUE)
     {
         return result;
@@ -122,37 +55,39 @@ SDL_AppResult btn_init_ctx(SDL_Renderer *renderer, const int w, const int h, But
 }
 
 /**
- * The function initializes a button. No resources are allocated.
+ * The function initializes the button. It does not set the position.
  */
-SDL_AppResult btn_set(Button *btn, const ButtonCtx *btn_ctx, const char *text, SDL_AppResult (*callback)(), const int x, const int y, const int w, const int h)
+SDL_AppResult btn_init(Button *btn, const ButtonCtx *btn_ctx, const char *text, const int w, const int h,
+                       SDL_AppResult (*callback)(void *data), void *data)
 {
+    btn->ctx = btn_ctx;
+    btn->data = data;
+    btn->text = text;
+    btn->callback = callback;
+    btn->mouse = false;
 
-    //
-    // Ensure that the button size is not greater than the textures.
-    //
-    if (w > btn_ctx->texture_nl->w || h > btn_ctx->texture_nl->h)
+    if (w > btn->ctx->texture_nl->w || h > btn->ctx->texture_nl->h)
     {
         SDL_Log("Invalid button sizes!");
         return SDL_APP_FAILURE;
     }
 
-    btn->rect.x = x;
-    btn->rect.y = y;
     btn->rect.w = w;
     btn->rect.h = h;
 
-    btn->text = text;
-
-    btn->txt_pos.x = x + ((float)(w - SDL_strlen(text) * CHAR_W)) / 2.0f;
-    btn->txt_pos.y = y + ((float)(h - CHAR_H)) / 2.0f;
-
-    btn->mouse = false;
-
-    btn->ctx = btn_ctx;
-
-    btn->callback = callback;
-
     return SDL_APP_CONTINUE;
+}
+
+/**
+ * The function sets the position of a button. This requires to compute the
+ * position of the text of the button.
+ */
+void btn_pos(Button *btn, const SDL_FPoint *pos)
+{
+    btn->rect.x = pos->x;
+    btn->rect.y = pos->y;
+
+    layout_text_frect(&btn->rect, btn->text, CHAR_W, CHAR_H, &btn->txt_pos);
 }
 
 /**
@@ -175,7 +110,7 @@ SDL_AppResult btn_event(SDL_Event *event, Button *btn)
 
         if (SDL_PointInRectFloat(&mouse, &btn->rect))
         {
-            return btn->callback();
+            return btn->callback(btn->data);
         }
         break;
 
@@ -197,7 +132,7 @@ SDL_AppResult btn_event(SDL_Event *event, Button *btn)
 /**
  * The function renders a button.
  */
-SDL_AppResult btn_render(SDL_Renderer *renderer, Button *btn)
+SDL_AppResult btn_render(SDL_Renderer *renderer, const Button *btn)
 {
     SDL_Texture *texture = btn->mouse ? btn->ctx->texture_hl : btn->ctx->texture_nl;
 
