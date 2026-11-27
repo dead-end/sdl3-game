@@ -34,6 +34,7 @@ static const EMoveType MOVE_SEQ_HARD_RIGHT[] = {E_MOVE_FORWARD, E_MOVE_RIGHT, E_
 static const EMoveType MOVE_SEQ_LEFT[] = {E_MOVE_FORWARD, E_MOVE_FORWARD, E_MOVE_LEFT, E_MOVE_FORWARD, E_MOVE_STOP};
 static const EMoveType MOVE_SEQ_RIGHT[] = {E_MOVE_FORWARD, E_MOVE_FORWARD, E_MOVE_RIGHT, E_MOVE_FORWARD, E_MOVE_STOP};
 static const EMoveType MOVE_SEQ_FORWARD[] = {E_MOVE_FORWARD, E_MOVE_FORWARD, E_MOVE_FORWARD, E_MOVE_FORWARD, E_MOVE_STOP};
+static const EMoveType MOVE_SEQ_TURN[] = {E_MOVE_FORWARD, E_MOVE_LEFT, E_MOVE_LEFT, E_MOVE_LEFT, E_MOVE_STOP};
 
 void move_seq_init(const GameState *gs, const EMoveType *sequence, Pose *pose, Sprite *sprite, MoveSeq *move_seq);
 
