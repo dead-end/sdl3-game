@@ -58,10 +58,11 @@ SDL_AppResult btn_init_ctx(SDL_Renderer *renderer, const int w, const int h, But
  * The function initializes the button. It does not set the position.
  */
 SDL_AppResult btn_setup(Button *btn, const ButtonCtx *btn_ctx, const char *text, const int w, const int h,
-                        SDL_AppResult (*callback)(void *data), void *data)
+                        BtnCallback *callback, void *data1, void *data2)
 {
     btn->ctx = btn_ctx;
-    btn->data = data;
+    btn->data1 = data1;
+    btn->data2 = data2;
     btn->text = text;
     btn->callback = callback;
     btn->mouse = false;
@@ -110,7 +111,7 @@ SDL_AppResult btn_event(SDL_Event *event, Button *btn)
 
         if (SDL_PointInRectFloat(&mouse, &btn->rect))
         {
-            return btn->callback(btn->data);
+            return btn->callback(btn->data1, btn->data2);
         }
         break;
 

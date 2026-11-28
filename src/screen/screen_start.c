@@ -31,9 +31,11 @@ typedef enum E_SCR_BTN
 /**
  * The callback function for the click event.
  */
-static SDL_AppResult _callback(void *data)
+static SDL_AppResult _callback(void *data1, void *data2)
 {
-    E_SCR_BTN btn = (E_SCR_BTN)PTR_TO_INT(data);
+    (void)data2;
+
+    E_SCR_BTN btn = (E_SCR_BTN)PTR_TO_INT(data1);
 
     switch (btn)
     {
@@ -82,14 +84,14 @@ static SDL_AppResult _init(SDL_Renderer *renderer)
     //
     // Set the buttons
     //
-    result = btn_setup(&_state->btn_start, &_state->btn_ctx, "Start", BTN_W, BTN_H, _callback, PTR_FROM_INT(BTN_START));
+    result = btn_setup(&_state->btn_start, &_state->btn_ctx, "Start", BTN_W, BTN_H, _callback, PTR_FROM_INT(BTN_START), NULL);
     if (result != SDL_APP_CONTINUE)
     {
         return result;
     }
     btn_pos(&_state->btn_start, &(SDL_FPoint){100, 10});
 
-    result = btn_setup(&_state->btn_quit, &_state->btn_ctx, "Quit", BTN_W, BTN_H, _callback, PTR_FROM_INT(BTN_QUIT));
+    result = btn_setup(&_state->btn_quit, &_state->btn_ctx, "Quit", BTN_W, BTN_H, _callback, PTR_FROM_INT(BTN_QUIT), NULL);
     if (result != SDL_APP_CONTINUE)
     {
         return result;

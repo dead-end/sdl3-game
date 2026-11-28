@@ -9,6 +9,8 @@ typedef struct ButtonCtx
     SDL_Texture *texture_hl;
 } ButtonCtx;
 
+typedef SDL_AppResult BtnCallback(void *data1, void *data2);
+
 typedef struct Button
 {
     SDL_FRect rect;
@@ -20,9 +22,11 @@ typedef struct Button
 
     const ButtonCtx *ctx;
 
-    SDL_AppResult (*callback)(void *data);
+    BtnCallback *callback;
 
-    void *data;
+    void *data1;
+
+    void *data2;
 } Button;
 
 extern const SDL_Color BTN_COLOR_FG;
@@ -30,7 +34,7 @@ extern const SDL_Color BTN_COLOR_FG;
 extern const SDL_Color BTN_COLOR_BG;
 
 SDL_AppResult btn_setup(Button *btn, const ButtonCtx *btn_ctx, const char *text, const int w, const int h,
-                        SDL_AppResult (*callback)(void *data), void *data);
+                        BtnCallback *callback, void *data1, void *data2);
 
 void btn_pos(Button *btn, const SDL_FPoint *pos);
 
