@@ -5,7 +5,7 @@
 /**
  * The method initializes the GameState.
  */
-SDL_AppResult gs_init(GameState *gs, SDL_Renderer *renderer)
+SDL_AppResult gs_setup(GameState *gs, SDL_Renderer *renderer)
 {
     //
     // renderer

@@ -36,7 +36,7 @@ static SDL_AppResult _init(SDL_Renderer *renderer)
         return SDL_APP_FAILURE;
     }
 
-    result = gs_init(&_state->gs, renderer);
+    result = gs_setup(&_state->gs, renderer);
     if (SDL_APP_CONTINUE != result)
     {
         return result;

@@ -57,8 +57,8 @@ SDL_AppResult btn_init_ctx(SDL_Renderer *renderer, const int w, const int h, But
 /**
  * The function initializes the button. It does not set the position.
  */
-SDL_AppResult btn_init(Button *btn, const ButtonCtx *btn_ctx, const char *text, const int w, const int h,
-                       SDL_AppResult (*callback)(void *data), void *data)
+SDL_AppResult btn_setup(Button *btn, const ButtonCtx *btn_ctx, const char *text, const int w, const int h,
+                        SDL_AppResult (*callback)(void *data), void *data)
 {
     btn->ctx = btn_ctx;
     btn->data = data;

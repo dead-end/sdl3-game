@@ -9,6 +9,6 @@ typedef struct Pose
     int direction;
 } Pose;
 
-void pose_init(Pose *pose, const int x, const int y, const int direction);
+void pose_setup(Pose *pose, const int x, const int y, const int direction);
 
 #endif

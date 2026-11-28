@@ -29,17 +29,17 @@ extern const SDL_Color BTN_COLOR_FG;
 
 extern const SDL_Color BTN_COLOR_BG;
 
-SDL_AppResult btn_init(Button *btn, const ButtonCtx *btn_ctx, const char *text, const int w, const int h,
-                       SDL_AppResult (*callback)(void *data), void *data);
+SDL_AppResult btn_setup(Button *btn, const ButtonCtx *btn_ctx, const char *text, const int w, const int h,
+                        SDL_AppResult (*callback)(void *data), void *data);
 
 void btn_pos(Button *btn, const SDL_FPoint *pos);
 
 SDL_AppResult btn_init_ctx(SDL_Renderer *renderer, const int w, const int h, ButtonCtx *btn_ctx);
 
+void btn_cleanup_ctx(ButtonCtx *btn_ctx);
+
 SDL_AppResult btn_render(SDL_Renderer *renderer, const Button *btn);
 
 SDL_AppResult btn_event(SDL_Event *event, Button *btn);
-
-void btn_cleanup_ctx(ButtonCtx *btn_ctx);
 
 #endif

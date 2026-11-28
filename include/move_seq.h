@@ -36,7 +36,7 @@ static const EMoveType *MOVE_SEQ_RIGHT = (const EMoveType[]){E_MOVE_FORWARD, E_M
 static const EMoveType *MOVE_SEQ_FORWARD = (const EMoveType[]){E_MOVE_FORWARD, E_MOVE_FORWARD, E_MOVE_FORWARD, E_MOVE_FORWARD, E_MOVE_STOP};
 static const EMoveType *MOVE_SEQ_TURN = (const EMoveType[]){E_MOVE_FORWARD, E_MOVE_LEFT, E_MOVE_LEFT, E_MOVE_LEFT, E_MOVE_STOP};
 
-void move_seq_init(const GameState *gs, const EMoveType *sequence, Pose *pose, Sprite *sprite, MoveSeq *move_seq);
+void move_seq_setup(const GameState *gs, const EMoveType *sequence, Pose *pose, Sprite *sprite, MoveSeq *move_seq);
 
 SDL_AppResult move_seq_update(const GameState *gs, const double delta_time, MoveSeq *move_seq);
 

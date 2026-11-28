@@ -134,7 +134,7 @@ SDL_AppResult move_seq_update(const GameState *gs, const double delta_time, Move
 /**
  * The function initializes a move sequence.
  */
-void move_seq_init(const GameState *gs, const EMoveType *sequence, Pose *pose, Sprite *sprite, MoveSeq *move_seq)
+void move_seq_setup(const GameState *gs, const EMoveType *sequence, Pose *pose, Sprite *sprite, MoveSeq *move_seq)
 {
     move_seq->pose = pose;
     move_seq->sprite = sprite;

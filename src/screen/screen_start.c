@@ -82,14 +82,14 @@ static SDL_AppResult _init(SDL_Renderer *renderer)
     //
     // Set the buttons
     //
-    result = btn_init(&_state->btn_start, &_state->btn_ctx, "Start", BTN_W, BTN_H, _callback, PTR_FROM_INT(BTN_START));
+    result = btn_setup(&_state->btn_start, &_state->btn_ctx, "Start", BTN_W, BTN_H, _callback, PTR_FROM_INT(BTN_START));
     if (result != SDL_APP_CONTINUE)
     {
         return result;
     }
     btn_pos(&_state->btn_start, &(SDL_FPoint){100, 10});
 
-    result = btn_init(&_state->btn_quit, &_state->btn_ctx, "Quit", BTN_W, BTN_H, _callback, PTR_FROM_INT(BTN_QUIT));
+    result = btn_setup(&_state->btn_quit, &_state->btn_ctx, "Quit", BTN_W, BTN_H, _callback, PTR_FROM_INT(BTN_QUIT));
     if (result != SDL_APP_CONTINUE)
     {
         return result;

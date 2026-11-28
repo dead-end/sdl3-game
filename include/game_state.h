@@ -72,7 +72,7 @@ typedef struct GameState
 #define SQRT_D_3 1.7320508075688772935
 #define SQRT_f_3 1.7320508f
 
-SDL_AppResult gs_init(GameState *gs, SDL_Renderer *renderer);
+SDL_AppResult gs_setup(GameState *gs, SDL_Renderer *renderer);
 
 void gs_frect_to_camera(const GameState *gs, SDL_FRect *r);
 

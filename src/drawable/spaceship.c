@@ -19,7 +19,7 @@ void spaceship_move(GameState *gs, const EMoveType *move)
 {
     if (!_move_seq.is_moving)
     {
-        move_seq_init(gs, move, &_starship.pose, &_starship.sprite, &_move_seq);
+        move_seq_setup(gs, move, &_starship.pose, &_starship.sprite, &_move_seq);
     }
 }
 
@@ -35,7 +35,7 @@ static SDL_AppResult _init(GameState *gs)
         return result;
     }
 
-    pose_init(&_starship.pose, 5, 5, 0);
+    pose_setup(&_starship.pose, 5, 5, 0);
 
     sprite_on_field(gs, &_starship.pose, &_starship.sprite);
 
