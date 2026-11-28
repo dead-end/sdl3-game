@@ -145,6 +145,11 @@ static SDL_AppResult _event(GameState *gs, SDL_Event *event)
             _current.x = p.x;
             _current.y = p.y;
         }
+        else
+        {
+            _current.x = -1;
+            _current.y = -1;
+        }
         break;
     }
 
