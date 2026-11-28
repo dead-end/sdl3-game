@@ -15,8 +15,8 @@ static SDL_Texture *_texture = NULL;
 /**
  * The function draws a highlighted hexagon on a texture.
  */
-SDL_AppResult _draw_hexagon(GameState *gs,
-                            SDL_FPoint *center)
+SDL_AppResult _draw_hexagon(const GameState *gs,
+                            const SDL_FPoint *center)
 {
     const SDL_FColor color = {0.0f, 1.0f, 0.0f, 0.2f};
 
