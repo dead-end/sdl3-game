@@ -15,6 +15,14 @@ typedef struct Starship
 
 static Starship _starship;
 
+void spaceship_move(GameState *gs, const EMoveType *move)
+{
+    if (!_move_seq.is_moving)
+    {
+        move_seq_init(gs, move, &_starship.pose, &_starship.sprite, &_move_seq);
+    }
+}
+
 /**
  * The function initializes the drawable.
  */
@@ -58,47 +66,6 @@ static SDL_AppResult _event(GameState *gs, SDL_Event *event)
 
             SDL_Log("field: %d / %d mouse: %f / %f", p.x, p.y, m.x, m.y);
         }
-        break;
-
-    case SDL_EVENT_KEY_DOWN:
-        switch (event->key.key)
-        {
-        case SDLK_1:
-            if (!_move_seq.is_moving)
-            {
-                move_seq_init(gs, MOVE_SEQ_HARD_LEFT, &_starship.pose, &_starship.sprite, &_move_seq);
-            }
-            break;
-
-        case SDLK_2:
-            if (!_move_seq.is_moving)
-            {
-                move_seq_init(gs, MOVE_SEQ_LEFT, &_starship.pose, &_starship.sprite, &_move_seq);
-            }
-            break;
-
-        case SDLK_3:
-            if (!_move_seq.is_moving)
-            {
-                move_seq_init(gs, MOVE_SEQ_FORWARD, &_starship.pose, &_starship.sprite, &_move_seq);
-            }
-            break;
-
-        case SDLK_4:
-            if (!_move_seq.is_moving)
-            {
-                move_seq_init(gs, MOVE_SEQ_RIGHT, &_starship.pose, &_starship.sprite, &_move_seq);
-            }
-            break;
-
-        case SDLK_5:
-            if (!_move_seq.is_moving)
-            {
-                move_seq_init(gs, MOVE_SEQ_HARD_RIGHT, &_starship.pose, &_starship.sprite, &_move_seq);
-            }
-            break;
-        }
-
         break;
     }
 
